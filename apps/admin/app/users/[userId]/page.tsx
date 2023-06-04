@@ -1,8 +1,8 @@
 import { env } from '@/lib/env'
 import { FetchResourceResponse, SanitizedUser } from '@/lib/types'
 import {} from 'next'
-import { UserForm } from '../components/UserForm'
-import { UserNavigation } from '../components/UserNavigation'
+import { UserForm } from '../_components/UserForm'
+import { UserNavigation } from '../_components/UserNavigation'
 
 export default async function EditUser({ params }: { params: { userId: string } }) {
   const response: FetchResourceResponse<SanitizedUser> = await (

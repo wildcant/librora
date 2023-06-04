@@ -1,6 +1,6 @@
 import { FetchResourcesResponse, SanitizedUser } from '@/lib/types'
 import Link from 'next/link'
-import { DeleteUserButton } from './components/DeleteUserButton'
+import { DeleteUserButton } from './_components/DeleteUserButton'
 import { env } from '@/lib/env'
 
 export default async function Users() {

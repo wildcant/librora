@@ -13,9 +13,6 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  let error = undefined
-  const closeAlert = () => {}
-
   return (
     <html>
       <body className={inter.className}>

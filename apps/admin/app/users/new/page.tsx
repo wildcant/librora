@@ -1,5 +1,5 @@
-import { UserNavigation } from '../components/UserNavigation'
-import { UserForm } from '../components/UserForm'
+import { UserNavigation } from '../_components/UserNavigation'
+import { UserForm } from '../_components/UserForm'
 
 export default function NewUser() {
   return (
