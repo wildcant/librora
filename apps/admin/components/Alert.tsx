@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext } from '@/hooks/context'
+import { createContext } from 'hooks'
 import { ResponseError } from '@/lib/types'
 import { Dispatch, PropsWithChildren, SetStateAction, useState } from 'react'
 

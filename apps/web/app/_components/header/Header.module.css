@@ -1,0 +1,11 @@
+.SearchBar {
+  @apply flex min-h-[56px] min-w-[285px] flex-row rounded-full items-center pr-2;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.SearchBarInput {
+  @apply h-full flex-1 rounded-l-full border-none p-0 pl-10 text-sm shadow-none drop-shadow-none;
+  @apply placeholder:font-sans placeholder:text-neutral-300;
+  @apply focus-visible:outline-primary focus:outline-0 focus:ring-0;
+  @apply md:rounded-full;
+}

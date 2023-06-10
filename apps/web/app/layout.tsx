@@ -1,11 +1,35 @@
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { Toaster } from '@/components/ui/Toaster'
+import { ModalProvider } from '../components/Modal'
+import { TabNavigator } from './_components/TabNavigator'
+import './globals.css'
+import { Merienda, Roboto_Slab, Plus_Jakarta_Sans } from '@next/font/google'
+
+const merienda = Merienda({ subsets: ['latin'], variable: '--font-merienda' })
+
+const robotoSlab = Roboto_Slab({
+  subsets: ['latin'],
+  variable: '--font-roboto-slab',
+  style: ['normal'],
+  weight: ['100', '300', '400', '500', '700', '900'],
+})
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta-sans',
+  style: ['normal', 'italic'],
+  weight: ['300', '400', '500', '600', '700'],
+})
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={`${merienda.variable} ${robotoSlab.variable} ${plusJakartaSans.variable}`}>
+      <ModalProvider>
+        <body>
+          {children}
+          <TabNavigator />
+          <Toaster />
+        </body>
+      </ModalProvider>
     </html>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext } from '@/hooks/context'
+import { createContext } from 'hooks'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 
 type ModalProps = {

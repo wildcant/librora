@@ -1,12 +1,9 @@
-import { fetchUsers } from 'lib/users'
+import { Header } from './_components/header/Header'
 
 export default async function IndexPage() {
-  const users = await fetchUsers()
-
   return (
     <div>
-      <h1>Hello World</h1>
-      <pre>{JSON.stringify(users, null, 2)}</pre>
+      <Header />
     </div>
   )
 }
