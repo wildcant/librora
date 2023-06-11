@@ -1,8 +1,7 @@
 import { Toaster } from '@/components/ui/Toaster'
+import { Merienda, Plus_Jakarta_Sans, Roboto_Slab } from '@next/font/google'
 import { ModalProvider } from '../components/Modal'
-import { TabNavigator } from './_components/TabNavigator'
 import './globals.css'
-import { Merienda, Roboto_Slab, Plus_Jakarta_Sans } from '@next/font/google'
 
 const merienda = Merienda({ subsets: ['latin'], variable: '--font-merienda' })
 
@@ -26,7 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <ModalProvider>
         <body>
           {children}
-          <TabNavigator />
           <Toaster />
         </body>
       </ModalProvider>

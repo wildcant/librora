@@ -1,3 +1,5 @@
+'use client'
+
 import { useCustomModal } from '@/components/Modal'
 import ForgotPasswordForm from '../ForgotPasswordForm'
 

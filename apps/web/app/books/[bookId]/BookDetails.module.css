@@ -1,0 +1,86 @@
+.Subtitle {
+  @apply text-2xl font-semibold;
+}
+
+.Container {
+  @apply mb-16;
+  display: grid;
+  grid-template-areas:
+    'book-title'
+    'book-author'
+    'book-cover'
+    'quick-facts'
+    'book-description'
+    'booking'
+    'owner-info'
+    'location';
+
+  @media (min-width: 768px) {
+    grid-template-areas:
+      'book-cover book-title'
+      'book-cover book-author'
+      'book-cover quick-facts'
+      'book-cover book-description'
+      'booking booking'
+      'owner-info location';
+
+    grid-template-columns: 30% 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 30px;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-areas:
+      'book-cover . book-title'
+      'book-cover . book-author'
+      'book-cover . book-description'
+      'book-cover . booking'
+      'book-cover . booking'
+      'quick-facts . location'
+      'owner-info . location';
+
+    grid-template-columns: 30% 1fr 65%;
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 30px;
+  }
+}
+
+.Cover {
+  @apply relative mt-4 aspect-[2/3];
+  grid-area: book-cover;
+}
+
+.Title {
+  @apply mt-2 text-2xl font-extrabold md:text-2xl lg:text-3xl;
+  grid-area: book-title;
+}
+
+.Author {
+  @apply text-base font-light md:text-xl lg:text-2xl;
+  grid-area: book-author;
+}
+
+.Booking {
+  @apply mt-6 border-t pt-6;
+  grid-area: booking;
+}
+
+.Description {
+  @apply mt-6 border-t pt-6;
+  grid-area: book-description;
+}
+
+.QuickFacts {
+  @apply mt-6 border-t pt-6;
+  grid-area: quick-facts;
+}
+
+.OwnerInfo {
+  @apply mt-6 flex flex-col border-t pt-6;
+  grid-area: owner-info;
+}
+
+.Location {
+  @apply mt-6 border-t pt-6 h-96;
+  grid-area: location;
+}

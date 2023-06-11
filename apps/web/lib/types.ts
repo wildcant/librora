@@ -2,7 +2,10 @@ import { User } from 'database/client'
 
 export enum Resource {
   USERS = 'users',
+  BOOKS = 'books',
 }
+
+export type ExcludeId<T> = Omit<T, 'id'>
 
 export type ResponseError = Array<{
   title: string

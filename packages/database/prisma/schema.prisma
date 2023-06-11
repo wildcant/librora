@@ -38,4 +38,22 @@ model User {
   status        Status    @default(PENDING)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  Book          Book[]
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  // author Author
+  cover       String?
+  date        String
+  description String
+  // editorial Editorial
+  // language ELanguage
+  numPages    Int
+  owner       User     @relation(fields: [userId], references: [id])
+  slug        String
+  title       String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

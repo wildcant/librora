@@ -18,9 +18,9 @@ type LoginFormProps = { isModal?: boolean }
 
 export function LoginForm({ isModal }: LoginFormProps) {
   const router = useRouter()
-  const { open: openSignUpModal } = useSignUpModal()
-  const { close: closeLoginModal } = useLoginModal()
-  const { open: openForgotPasswordModal } = useForgotPasswordModal()
+  const loginModal = useSignUpModal()
+  const signUpModal = useLoginModal()
+  const forgotPasswordModal = useForgotPasswordModal()
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     /* Dev only. 
@@ -92,8 +92,8 @@ export function LoginForm({ isModal }: LoginFormProps) {
                       className="p-0 m-0 text-xs"
                       type="button"
                       onClick={() => {
-                        closeLoginModal()
-                        openForgotPasswordModal()
+                        loginModal.close()
+                        forgotPasswordModal.open()
                       }}
                     >
                       Forgot password?
@@ -124,8 +124,8 @@ export function LoginForm({ isModal }: LoginFormProps) {
             type="button"
             className="ml-2 text-xs"
             onClick={() => {
-              closeLoginModal()
-              openSignUpModal()
+              loginModal.close()
+              signUpModal.open()
             }}
           >
             Sign up

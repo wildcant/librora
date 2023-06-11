@@ -48,9 +48,12 @@
     "bcrypt": "^5.1.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@types/bcrypt": "^5.0.0",
+    "@types/lodash": "^4.14.195",
     "config": "workspace:*",
     "eslint": "^8.12.0",
+    "lodash": "^4.17.21",
     "prisma": "^4.15.0",
     "rimraf": "^3.0.2",
     "tsconfig": "workspace:*",

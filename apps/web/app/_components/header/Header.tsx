@@ -9,7 +9,7 @@ import world from '@/assets/world.jpg'
 import { Logo } from '@/components/Logo'
 import { useBareModal } from '@/components/Modal'
 import { Icon } from '@/components/icon'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { Calendar } from '@/components/ui/Calendar'
 import {
@@ -20,6 +20,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/NavigationMenu'
 import { Popover, PopoverTrigger } from '@/components/ui/Popover'
+import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
 import { PopoverContent } from '@radix-ui/react-popover'
 import type { ToggleGroupImplSingleProps } from '@radix-ui/react-toggle-group'
@@ -27,11 +28,15 @@ import * as ToggleGroup from '@radix-ui/react-toggle-group'
 import format from 'date-fns/format'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
-import { Search, Settings2, XCircle } from 'lucide-react'
+import debounce from 'lodash/debounce'
+import { Search, Settings2, UserCircle2, XCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DateRange, SelectRangeEventHandler } from 'react-day-picker'
+import { useLoginModal } from '../modals/login'
+import { useSignUpModal } from '../modals/sign-up'
 import s from './Header.module.css'
 
 const regions = [
@@ -81,6 +86,9 @@ function DesktopSearchForm({ className }: SearchFormProps) {
   const [fromValue, setFromValue] = useState<string>('')
   const [toValue, setToValue] = useState<string>('')
   const [value, setValue] = useState<string>('')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [open, setOpen] = useState(false)
 
   // Reference https://react-day-picker.js.org/guides/input-fields#example-range-selection
   const handleRangeSelect: SelectRangeEventHandler = (_, selectedDay) => {
@@ -111,6 +119,13 @@ function DesktopSearchForm({ className }: SearchFormProps) {
     }
   }
 
+  const formattedDateRange = () => {
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    if (!startDate || !endDate) return null
+    return `${format(new Date(startDate), 'MMM dd')} - ${format(new Date(endDate), 'MMM dd')}`
+  }
+
   const calendar = (
     <Calendar
       mode="range"
@@ -122,73 +137,141 @@ function DesktopSearchForm({ className }: SearchFormProps) {
   )
 
   return (
-    <NavigationMenu value={value} onValueChange={setValue} className={className}>
-      <NavigationMenuList>
-        <NavigationMenuItem value="a">
-          <NavigationMenuTrigger
-            onPointerMove={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
-            className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100"
+    <div className={cn(className, { 'h-40': open })}>
+      {open ? (
+        <div className="h-full flex items-end">
+          <NavigationMenu
+            value={value}
+            onValueChange={(v) => {
+              setValue(v)
+            }}
           >
-            <span className="text-xs font-light text-neutral-500">Where</span>
-            <span className="text-xs font-light text-neutral-700">{region ?? 'Search Destinations'}</span>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent
-            onPointerEnter={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
-          >
-            <div className="p-4">
-              <span className="font-bold text-xs">Search by region</span>
-              <RegionSelector
-                value={region}
-                onValueChange={(r) => {
-                  setRegion(r)
-                  setValue('b')
-                }}
-              />
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+            <NavigationMenuList>
+              <NavigationMenuItem value="a">
+                <NavigationMenuTrigger
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                  className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100"
+                >
+                  <span className="text-xs font-light text-neutral-500">Where</span>
+                  <span className="text-xs font-light text-neutral-700">
+                    {region ?? 'Search Destinations'}
+                  </span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                >
+                  <div className="p-4">
+                    <span className="font-bold text-xs">Search by region</span>
+                    <RegionSelector
+                      value={region}
+                      onValueChange={(r) => {
+                        setRegion(r)
+                        setValue('b')
+                      }}
+                    />
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
 
-        <NavigationMenuItem value="b">
-          <NavigationMenuTrigger
-            onPointerMove={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
-            className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100 whitespace-nowrap"
+              <NavigationMenuItem value="b">
+                <NavigationMenuTrigger
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                  className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100 whitespace-nowrap"
+                >
+                  <span className="text-xs font-light text-neutral-500">Start date</span>
+                  <span className="text-xs font-light text-neutral-700">{fromValue || 'Add dates'}</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                >
+                  {calendar}
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem value="c">
+                <NavigationMenuTrigger
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                  className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100 whitespace-nowrap"
+                >
+                  <span className="text-xs font-light text-neutral-500">End date</span>
+                  <span className="text-xs font-light text-neutral-700">{toValue || 'Add dates'}</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent
+                  onPointerMove={(event) => event.preventDefault()}
+                  onPointerLeave={(event) => event.preventDefault()}
+                >
+                  {calendar}
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Button className="w-8 h-8 rounded-full p-0">
+                  <Search
+                    size={16}
+                    onClick={() => {
+                      let query = '?'
+                      if (region) {
+                        query += `region=${region}`
+                      }
+                      if (selectedRange?.from && selectedRange?.to) {
+                        query += `&startDate=${format(selectedRange.from, 'yyyy-MM-dd')}&endDate=${format(
+                          selectedRange.to,
+                          'yyyy-MM-dd'
+                        )}`
+                      }
+                      console.log({ query })
+                      router.push(query)
+                      setOpen(false)
+                    }}
+                  />
+                </Button>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+      ) : (
+        <div className="flex shadow-md border border-solid rounded-full items-center">
+          <input
+            type="text"
+            className={cn(s.SearchBarInput, '!pl-4')}
+            autoComplete="off"
+            onChange={debounce(
+              (e) => (e.target.value ? router.push(`?search=${e.target.value}`) : router.push('/')),
+              300
+            )}
+          />
+          <Separator orientation="vertical" className="h-5" />
+          <Button
+            variant="ghost"
+            className="text-sm rounded-none"
+            onClick={() => {
+              setOpen(true)
+              setValue('a')
+            }}
           >
-            <span className="text-xs font-light text-neutral-500">Start date</span>
-            <span className="text-xs font-light text-neutral-700">{fromValue || 'Add dates'}</span>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent
-            onPointerEnter={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
+            {searchParams.get('region') || 'Anywhere'}
+          </Button>
+          <Separator orientation="vertical" className="h-5" />
+          <Button
+            variant="ghost"
+            className="text-sm rounded-none"
+            onClick={() => {
+              setOpen(true)
+              setValue('b')
+            }}
           >
-            {calendar}
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem value="c">
-          <NavigationMenuTrigger
-            onPointerMove={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
-            className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100 whitespace-nowrap"
-          >
-            <span className="text-xs font-light text-neutral-500">End date</span>
-            <span className="text-xs font-light text-neutral-700">{toValue || 'Add dates'}</span>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent
-            onPointerEnter={(event) => event.preventDefault()}
-            onPointerLeave={(event) => event.preventDefault()}
-          >
-            {calendar}
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Button className="w-8 h-8 rounded-full p-0">
+            {formattedDateRange() ?? 'Any week'}
+          </Button>
+          <Separator orientation="vertical" className="h-5" />
+          <Button className="w-8 h-8 rounded-full p-2 mx-2">
             <Search size={16} />
           </Button>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -196,8 +279,10 @@ type DesktopNavbarProps = {
   className?: string
 }
 function DesktopNavbar({ className }: DesktopNavbarProps) {
+  const { open: openLogin } = useLoginModal()
+  const { open: openSignUp } = useSignUpModal()
   return (
-    <div className={cn('flex flex-row w-full justify-between', className)}>
+    <div className={cn('flex flex-row w-full justify-between items-start', className)}>
       <Link href="/" className="cursor-pointer">
         <Logo />
       </Link>
@@ -205,19 +290,25 @@ function DesktopNavbar({ className }: DesktopNavbarProps) {
       <DesktopSearchForm />
 
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger className="data-[state=open]:shadow-md rounded-full">
           <Avatar>
-            <AvatarImage src="" alt="@wc" />
-            <AvatarFallback>WC</AvatarFallback>
+            <AvatarFallback className="bg-transparent">
+              <UserCircle2 size={32} />
+            </AvatarFallback>
           </Avatar>
         </PopoverTrigger>
-        <PopoverContent className="w-80" align="end">
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <h4 className="font-medium leading-none">Dimensions</h4>
-              <p className="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
-            </div>
-            <div className="grid gap-2"></div>
+        <PopoverContent
+          className="w-60 bg-white rounded-2xl shadow-md py-4 border"
+          align="end"
+          sideOffset={10}
+        >
+          <div className="flex flex-col">
+            <Button variant="ghost" className="justify-start pl-8" onClick={openLogin}>
+              Log in
+            </Button>
+            <Button variant="ghost" className="justify-start pl-8" onClick={openSignUp}>
+              Sign up
+            </Button>
           </div>
         </PopoverContent>
       </Popover>
@@ -338,11 +429,23 @@ type SearchBarProps = {
 }
 export function MobileSearchBar({ className }: SearchBarProps) {
   const { open } = useMobileSearchFormModal()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   return (
     <div className={className}>
       <div className={s.SearchBar}>
         <div className="relative flex flex-1 flex-row items-center">
-          <input type="text" className={s.SearchBarInput} autoComplete="off" />
+          <input
+            type="text"
+            className={s.SearchBarInput}
+            autoComplete="off"
+            defaultValue={searchParams.get('search')}
+            onChange={debounce(
+              (e) => (e.target.value ? router.push(`?search=${e.target.value}`) : router.push('/')),
+              300
+            )}
+          />
           <Icon name="search" className="absolute left-4" size="sm" />
         </div>
 
@@ -355,11 +458,15 @@ export function MobileSearchBar({ className }: SearchBarProps) {
   )
 }
 
-export function Header() {
+type HeaderProps = { className?: string }
+export function Header({ className }: HeaderProps) {
   return (
-    <>
-      <DesktopNavbar className="hidden md:flex" />
-      <MobileSearchBar className="md:hidden" />
-    </>
+    <div className={className}>
+      <div className="p-2">
+        <DesktopNavbar className="hidden md:flex" />
+        <MobileSearchBar className="md:hidden" />
+      </div>
+      <Separator />
+    </div>
   )
 }

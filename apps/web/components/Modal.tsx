@@ -66,7 +66,7 @@ function Modal(props: ModalProps) {
     secondaryProps,
     children,
     dialogProps,
-    contentProps,
+    contentProps = {},
     onClose,
   } = props
 
@@ -103,7 +103,6 @@ function Modal(props: ModalProps) {
               <div className="mt-4 flex justify-end gap-2">
                 <Button
                   color="primary"
-                  // size={{ base: 'xs', md: 'sm' }}
                   size="sm"
                   {...primaryProps}
                   disabled={primaryProps?.disabled || modal?.isLoading}
@@ -113,7 +112,6 @@ function Modal(props: ModalProps) {
                 <Button
                   color="primary"
                   onClick={() => closeModal(id)}
-                  // size={{ base: 'xs', md: 'sm' }}
                   size="sm"
                   variant="ghost"
                   {...secondaryProps}

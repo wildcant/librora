@@ -6,17 +6,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/Input'
 import { SignUpSchema, signUpSchema } from '@/lib/schemas/sign-up'
 import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useLoginModal } from './modals/login'
 import { useSignUpModal } from './modals/sign-up'
 
 type SignUpFormProps = { isModal?: boolean }
 export default function SignUpForm({ isModal }: SignUpFormProps) {
-  const { open } = useLoginModal()
-  const { close } = useSignUpModal()
-  const router = useRouter()
+  const loginModal = useLoginModal()
+  const signUpModal = useSignUpModal()
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     /* Dev only. 
@@ -113,8 +110,8 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
             className="ml-2 text-xs"
             type="button"
             onClick={() => {
-              close()
-              open()
+              signUpModal.close()
+              loginModal.open()
             }}
           >
             Login
