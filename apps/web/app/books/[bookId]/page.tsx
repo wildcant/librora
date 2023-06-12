@@ -13,10 +13,14 @@ type BookDetailsProps = {
 }
 
 export default async function BookDetails({ params }: BookDetailsProps) {
-  const { title, cover, numPages, date, description, owner } = await prisma.book.findUnique({
+  const book = await prisma.book.findUnique({
     where: { id: params.bookId },
     include: { owner: { select: { firstName: true, lastName: true, createdAt: true } } },
   })
+
+  if (!book) return <div>Not found.</div>
+
+  const { title, cover, numPages, date, description, owner } = book
 
   return (
     <div className={s.Container}>
@@ -57,17 +61,21 @@ export default async function BookDetails({ params }: BookDetailsProps) {
         <p className="text-md font-light">{description}</p>
       </div>
 
-      <div className={s.OwnerInfo}>
-        <h3 className={s.Subtitle}>
-          Lent by {owner.firstName} {owner.lastName}
-        </h3>
-        <span className="text-lg font-light">Joined in {format(new Date(owner.createdAt), 'MMMM yyyy')}</span>
+      {owner && (
+        <div className={s.OwnerInfo}>
+          <h3 className={s.Subtitle}>
+            Lent by {owner.firstName} {owner.lastName}
+          </h3>
+          <span className="text-lg font-light">
+            Joined in {format(new Date(owner.createdAt), 'MMMM yyyy')}
+          </span>
 
-        {/* TODO: Add link to contact book owner */}
-        <Link href={`#`} className="mt-4">
-          Contact Owner
-        </Link>
-      </div>
+          {/* TODO: Add link to contact book owner */}
+          <Link href={`#`} className="mt-4">
+            Contact Owner
+          </Link>
+        </div>
+      )}
 
       {/* 
       {owner.location ? (

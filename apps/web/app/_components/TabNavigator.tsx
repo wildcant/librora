@@ -2,6 +2,7 @@
 
 import clsx from 'clsx'
 import { LucideIcon, Search, UserCircle2 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -30,11 +31,16 @@ function TabScreen({ href, text, icon: Icon }: TabScreenProps) {
 }
 
 export function TabNavigator() {
+  const session = useSession()
   return (
     <div className="fixed bottom-0 z-49 flex h-16 w-full justify-center border-t-[1px] border-t-neutral-100 bg-white md:hidden">
       <div className="flex h-full flex-row items-center gap-10">
         <TabScreen href="/" text="Explore" icon={Search} />
-        <TabScreen href="/login" text="Sign in" icon={UserCircle2} />
+        {session.status === 'authenticated' ? (
+          <TabScreen href="/account-settings" text="Profile" icon={UserCircle2} />
+        ) : (
+          <TabScreen href="/login" text="Sign in" icon={UserCircle2} />
+        )}
       </div>
     </div>
   )

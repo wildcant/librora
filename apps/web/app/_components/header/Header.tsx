@@ -9,7 +9,7 @@ import world from '@/assets/world.jpg'
 import { Logo } from '@/components/Logo'
 import { useBareModal } from '@/components/Modal'
 import { Icon } from '@/components/icon'
-import { Avatar, AvatarFallback } from '@/components/ui/Avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { Calendar } from '@/components/ui/Calendar'
 import {
@@ -30,6 +30,7 @@ import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
 import debounce from 'lodash/debounce'
 import { Search, Settings2, UserCircle2, XCircle } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -63,6 +64,7 @@ function RegionSelector({
     >
       {regions.map((region) => (
         <ToggleGroup.Item
+          key={region.value}
           className="group min-w-[126px] snap-center first:ml-4 last:mr-4 md:first:ml-0 md:last:mr-0"
           value={region.value}
         >
@@ -94,7 +96,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
   const handleRangeSelect: SelectRangeEventHandler = (_, selectedDay) => {
     if (value === 'b') {
       let to = selectedRange?.to
-      if (isAfter(selectedDay, to)) {
+      if (to && isAfter(selectedDay, to)) {
         setToValue('')
         to = undefined
       }
@@ -107,7 +109,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
 
     if (value === 'c') {
       let from = selectedRange?.from
-      if (isBefore(selectedDay, from)) {
+      if (from && isBefore(selectedDay, from)) {
         setFromValue(format(selectedDay, 'MMM dd'))
         setToValue('')
         setSelectedRange({ from: selectedDay, to: undefined })
@@ -281,6 +283,8 @@ type DesktopNavbarProps = {
 function DesktopNavbar({ className }: DesktopNavbarProps) {
   const { open: openLogin } = useLoginModal()
   const { open: openSignUp } = useSignUpModal()
+  const session = useSession()
+
   return (
     <div className={cn('flex flex-row w-full justify-between items-start', className)}>
       <Link href="/" className="cursor-pointer">
@@ -291,11 +295,21 @@ function DesktopNavbar({ className }: DesktopNavbarProps) {
 
       <Popover>
         <PopoverTrigger className="data-[state=open]:shadow-md rounded-full">
-          <Avatar>
-            <AvatarFallback className="bg-transparent">
-              <UserCircle2 size={32} />
-            </AvatarFallback>
-          </Avatar>
+          {session.status === 'authenticated' ? (
+            <Avatar>
+              <AvatarImage src={session.data.user?.image ?? ''} alt="profile-image" />
+              <AvatarFallback className="bg-gray-800 text-white">
+                {session.data.user?.firstName?.charAt(0)}
+                {session.data.user?.lastName?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <Avatar>
+              <AvatarFallback className="bg-transparent">
+                <UserCircle2 size={32} />
+              </AvatarFallback>
+            </Avatar>
+          )}
         </PopoverTrigger>
         <PopoverContent
           className="w-60 bg-white rounded-2xl shadow-md py-4 border"
@@ -303,12 +317,22 @@ function DesktopNavbar({ className }: DesktopNavbarProps) {
           sideOffset={10}
         >
           <div className="flex flex-col">
-            <Button variant="ghost" className="justify-start pl-8" onClick={openLogin}>
-              Log in
-            </Button>
-            <Button variant="ghost" className="justify-start pl-8" onClick={openSignUp}>
-              Sign up
-            </Button>
+            {session.status === 'authenticated' ? (
+              <>
+                <Button variant="ghost" className="justify-start pl-8" onClick={() => signOut()}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" className="justify-start pl-8" onClick={openLogin}>
+                  Log in
+                </Button>
+                <Button variant="ghost" className="justify-start pl-8" onClick={openSignUp}>
+                  Sign up
+                </Button>
+              </>
+            )}
           </div>
         </PopoverContent>
       </Popover>
@@ -440,7 +464,7 @@ export function MobileSearchBar({ className }: SearchBarProps) {
             type="text"
             className={s.SearchBarInput}
             autoComplete="off"
-            defaultValue={searchParams.get('search')}
+            defaultValue={searchParams.get('search') ?? ''}
             onChange={debounce(
               (e) => (e.target.value ? router.push(`?search=${e.target.value}`) : router.push('/')),
               300

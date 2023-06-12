@@ -24,13 +24,13 @@
     "@types/bcrypt": "^5.0.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^17.0.12",
-    "@types/react": "^18.0.22",
-    "@types/react-dom": "^18.0.7",
+    "@types/react": "^18.2.8",
+    "@types/react-dom": "^18.2.4",
     "config": "workspace:*",
     "database": "workspace:*",
     "eslint": "^7.32.0",
     "tsconfig": "workspace:*",
-    "typescript": "^4.5.3",
-    "hooks": "workspace:*"
+    "typescript": "^4.9.5",
+    "@librora/hooks": "workspace:*"
   }
 }

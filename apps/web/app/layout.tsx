@@ -1,6 +1,8 @@
 import { Toaster } from '@/components/ui/Toaster'
 import { Merienda, Plus_Jakarta_Sans, Roboto_Slab } from '@next/font/google'
-import { ModalProvider } from '../components/Modal'
+
+import { getServerSession } from 'next-auth'
+import { Providers } from './Providers'
 import './globals.css'
 
 const merienda = Merienda({ subsets: ['latin'], variable: '--font-merienda' })
@@ -19,15 +21,15 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['300', '400', '500', '600', '700'],
 })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${merienda.variable} ${robotoSlab.variable} ${plusJakartaSans.variable}`}>
-      <ModalProvider>
+      <Providers session={await getServerSession()}>
         <body>
           {children}
           <Toaster />
         </body>
-      </ModalProvider>
+      </Providers>
     </html>
   )
 }

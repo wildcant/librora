@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext } from 'hooks'
+import { createContext } from '@librora/hooks'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 
 type ModalProps = {
@@ -115,7 +115,6 @@ export function ModalProvider({ children }: PropsWithChildren) {
       const modalIndex = currentModals.findIndex((modal) => modal.id === id)
       // If the modal exist update loading flag.
       if (modalIndex !== -1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         updatedModals[modalIndex]!.loading = loading
       }
       return updatedModals

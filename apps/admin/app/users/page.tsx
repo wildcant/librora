@@ -1,16 +1,9 @@
-import { FetchResourcesResponse, SanitizedUser } from '@/lib/types'
+import { prisma } from 'database/server'
 import Link from 'next/link'
 import { DeleteUserButton } from './_components/DeleteUserButton'
-import { env } from '@/lib/env'
 
 export default async function Users() {
-  const response: FetchResourcesResponse<SanitizedUser> = await (
-    await fetch(`${env.ADMIN_URL}/api/users`)
-  ).json()
-
-  if ('errors' in response) {
-    return <div>There was a problem loading the users</div>
-  }
+  const users = await prisma.user.findMany()
 
   return (
     <>
@@ -45,12 +38,12 @@ export default async function Users() {
           </tr>
         </thead>
         <tbody>
-          {response.data.map((user) => (
+          {users.map((user) => (
             <tr key={user.id}>
               <td>
-                {user.attributes.firstName} {user.attributes.lastName}
+                {user.firstName} {user.lastName}
               </td>
-              <td>{user.attributes.email}</td>
+              <td>{user.email}</td>
               <td>
                 <div className="row end-xs" style={{ gap: 6 }}>
                   <Link className="icon-button text-yellow" href={`/users/${user.id}`}>

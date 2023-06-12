@@ -16,7 +16,7 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
   const signUpModal = useSignUpModal()
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
-    /* Dev only. 
+    /* Dev only.  */
     defaultValues: {
       firstName: 'Willy',
       lastName: 'Wonka',
@@ -26,7 +26,9 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
     /* */
   })
 
-  function signUp(formData: SignUpSchema) {}
+  function signUp(formData: SignUpSchema) {
+    console.log({ formData })
+  }
 
   return (
     <Form {...form}>

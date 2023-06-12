@@ -1,11 +1,10 @@
-import { loginSchema } from '@/lib/schemas/login'
-import { z } from 'zod'
-import { prisma } from 'database/server'
-import bcrypt from 'bcrypt'
-import omit from 'lodash/omit'
 import { env } from '@/lib/env'
-import { SignJWT, decodeJwt } from 'jose'
+import { loginSchema } from '@/lib/schemas/login'
 import { FetchResourceResponse, Resource, ResponseError, SanitizedUser } from '@/lib/types'
+import bcrypt from 'bcrypt'
+import { prisma } from 'database/server'
+import { SignJWT, decodeJwt } from 'jose'
+import omit from 'lodash/omit'
 
 export async function POST(req: Request) {
   const { email, password } = loginSchema.parse(await req.json())

@@ -9,7 +9,7 @@ import { FetchResourceResponse, SanitizedUser } from '@/lib/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
-export default function ForgotPasswordForm() {
+export function ForgotPasswordForm() {
   const form = useForm<ForgotPasswordData>({
     resolver: zodResolver(forgotPasswordSchema),
     /* Dev only.

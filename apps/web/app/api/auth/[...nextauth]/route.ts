@@ -1,13 +1,44 @@
-import NextAuth from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
+import NextAuth from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 /** Docs https://next-auth.js.org/configuration/pages */
 const handler = NextAuth({
-  session: { strategy: 'jwt' },
   adapter: PrismaAdapter(prisma),
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.type = user.type
+        token.email = user.email
+        token.emailVerified = user.emailVerified
+        token.firstName = user.firstName
+        token.lastName = user.lastName
+        token.role = user.role
+        token.status = user.status
+        token.createdAt = user.createdAt
+        token.updatedAt = user.updatedAt
+      }
+      return token
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.type = token.type
+        session.user.email = token.email
+        session.user.emailVerified = token.emailVerified
+        session.user.firstName = token.firstName
+        session.user.lastName = token.lastName
+        session.user.role = token.role
+        session.user.status = token.status
+        session.user.createdAt = token.createdAt
+        session.user.updatedAt = token.updatedAt
+      }
+      return session
+    },
+  },
+  debug: process.env.NODE_ENV === 'development',
+  pages: { signIn: '/' },
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -36,6 +67,7 @@ const handler = NextAuth({
       },
     }),
   ],
+  session: { strategy: 'jwt' },
 })
 
 export { handler as GET, handler as POST }

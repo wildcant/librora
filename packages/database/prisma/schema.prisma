@@ -50,7 +50,7 @@ model Book {
   // editorial Editorial
   // language ELanguage
   numPages    Int
-  owner       User     @relation(fields: [userId], references: [id])
+  owner       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slug        String
   title       String
   userId      String

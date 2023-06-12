@@ -3,7 +3,7 @@
 import { Button, ButtonProps } from '@/components/ui/Button'
 import { Dialog, DialogContent, DialogContentProps, DialogHeader, DialogProps } from '@/components/ui/Dialog'
 import { cn } from '@/lib/utils'
-import { createContext } from 'hooks'
+import { createContext } from '@librora/hooks'
 import { ComponentPropsWithoutRef, PropsWithChildren, ReactNode, useState } from 'react'
 
 type ModalProviderProps = {
@@ -154,7 +154,6 @@ export function ModalProvider({ children }: PropsWithChildren) {
       const modalIndex = currentModals.findIndex((modal) => modal.id === id)
       // If the modal exist update isLoading flag.
       if (modalIndex !== -1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         updatedModals[modalIndex]!.isLoading = isLoading
       }
       return updatedModals

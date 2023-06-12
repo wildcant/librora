@@ -1,4 +1,5 @@
-import { ForgotPasswordForm } from '@/app/_components/ForgotPasswordForm'
+import { ForgotPasswordForm } from '../_components/ForgotPasswordForm'
+import { Logo } from '@/components/Logo'
 import Link from 'next/link'
 
 export default function ForgotPassword() {
@@ -23,7 +24,8 @@ export default function ForgotPassword() {
   }
 
   return (
-    <>
+    <main className="px-4 py-6">
+      <Logo />
       <p className="mb-6 text-xl">Forgot Password?</p>
       <p className="mb-8 text-sm">
         Enter the email address you used when you joined and we&apos;ll send you instructions to reset your
@@ -37,6 +39,6 @@ export default function ForgotPassword() {
           Sign Up
         </Link>
       </div>
-    </>
+    </main>
   )
 }

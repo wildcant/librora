@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/Input'
 import { LoginSchema, loginSchema } from '@/lib/schemas/login'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -18,12 +18,14 @@ type LoginFormProps = { isModal?: boolean }
 
 export function LoginForm({ isModal }: LoginFormProps) {
   const router = useRouter()
-  const loginModal = useSignUpModal()
-  const signUpModal = useLoginModal()
+  const signUpModal = useSignUpModal()
+  const loginModal = useLoginModal()
   const forgotPasswordModal = useForgotPasswordModal()
+  const { status } = useSession()
+
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
-    /* Dev only. 
+    /* Dev only. */
     defaultValues: {
       email: 'joe@mail.com',
       password: '12345',
@@ -38,13 +40,18 @@ export function LoginForm({ isModal }: LoginFormProps) {
         password: values.password,
         redirect: false,
       })
-      if (response.error) {
+      if (response?.error) {
         // TODO: Handle error.
         return
       }
 
-      if (response.ok) {
-        router.refresh()
+      if (response?.ok) {
+        if (isModal) {
+          loginModal.close()
+          router.refresh()
+        } else {
+          router.replace('/')
+        }
         return
       }
       throw new Error('Unexpected response from sign in.')
@@ -110,7 +117,7 @@ export function LoginForm({ isModal }: LoginFormProps) {
         </div>
 
         <DialogFooter>
-          <Button type="submit" variant="default">
+          <Button type="submit" variant="default" loading={status === 'loading'}>
             Continue
           </Button>
         </DialogFooter>

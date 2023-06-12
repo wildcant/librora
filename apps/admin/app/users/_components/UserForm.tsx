@@ -4,11 +4,11 @@ import { userSchema, type IUserSchema } from '@/lib/schemas/user'
 import { FetchResourceResponse, ResponseError, SanitizedUser } from '@/lib/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Role, Status, Type } from 'database/client'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { DefaultValues, useForm } from 'react-hook-form'
 
-type UserFormProps = { mode: 'create' } | { mode: 'edit'; defaultValues: SanitizedUser }
+type UserFormProps = { mode: 'create' } | { mode: 'edit'; defaultValues: SanitizedUser; userId: string }
 export function UserForm(props: UserFormProps) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -29,6 +29,7 @@ export function UserForm(props: UserFormProps) {
       firstName: props.defaultValues.firstName,
       lastName: props.defaultValues.lastName,
       email: props.defaultValues.email,
+      password: props.defaultValues.password ?? '',
     }
   }
 
@@ -43,7 +44,6 @@ export function UserForm(props: UserFormProps) {
       const response: FetchResourceResponse<SanitizedUser> = await (
         await fetch('/api/users', { method: 'post', body: JSON.stringify(userData) })
       ).json()
-
       if ('errors' in response) {
         setErrors(response.errors)
         return
@@ -57,17 +57,19 @@ export function UserForm(props: UserFormProps) {
     }
   }
 
-  async function updateUser(userData: IUserSchema) {
+  async function updateUser(userData: IUserSchema, id: string) {
     setSubmitting(true)
     try {
       const response: FetchResourceResponse<SanitizedUser> = await (
-        await fetch('/api/users', { method: 'patch', body: JSON.stringify(userData) })
+        await fetch(`/api/users/${id}`, { method: 'PATCH', body: JSON.stringify(userData) })
       ).json()
 
       if ('errors' in response) {
         setErrors(response.errors)
         return
       }
+
+      router.replace('/users')
     } catch (error) {
       console.error(`TODO: Handle error. Unexpected error updating user. ${error}`)
     } finally {
@@ -79,7 +81,7 @@ export function UserForm(props: UserFormProps) {
     if (props.mode === 'create') {
       createUser(userData)
     } else if (props.mode === 'edit') {
-      updateUser(userData)
+      updateUser(userData, props.userId)
     } else {
       throw new Error(`Invalid form mode. `)
     }
@@ -93,7 +95,7 @@ export function UserForm(props: UserFormProps) {
     } else if (type === 'USER') {
       setValue('role', Role.LENDER_BORROWER_USER)
     }
-  }, [type])
+  }, [type, setValue])
 
   let submitLabel = 'Submit'
   if (props.mode === 'create') {
@@ -114,7 +116,8 @@ export function UserForm(props: UserFormProps) {
               <path d="M4.00098 20V14C4.00098 9.58172 7.5827 6 12.001 6C16.4193 6 20.001 9.58172 20.001 14V20H21.001V22H3.00098V20H4.00098ZM6.00098 14H8.00098C8.00098 11.7909 9.79184 10 12.001 10V8C8.68727 8 6.00098 10.6863 6.00098 14ZM11.001 2H13.001V5H11.001V2ZM19.7792 4.80761L21.1934 6.22183L19.0721 8.34315L17.6578 6.92893L19.7792 4.80761ZM2.80859 6.22183L4.22281 4.80761L6.34413 6.92893L4.92991 8.34315L2.80859 6.22183Z"></path>
             </svg>
             <p>
-              There was a problem trying to process you're request. <br /> Please review the following errors:
+              There was a problem trying to process you&apos;re request. <br /> Please review the following
+              errors:
             </p>
           </div>
           <ul style={{ marginBottom: 0 }}>

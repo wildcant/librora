@@ -1,28 +1,9 @@
-import { env } from '@/lib/env'
 import { IUserSchema, userSchema } from '@/lib/schemas/user'
-import {
-  ResponseError,
-  FetchResourceResponse,
-  FetchResourcesResponse,
-  Resource,
-  SanitizedUser,
-} from '@/lib/types'
+import { FetchResourceResponse, ResponseError, SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import omit from 'lodash/omit'
 import z from 'zod'
-
-export async function GET() {
-  const users = await prisma.user.findMany()
-  const res: FetchResourcesResponse<SanitizedUser> = {
-    data: users.map((user) => ({
-      type: Resource.USERS,
-      id: user.id,
-      attributes: omit(user, ['id', 'password']),
-    })),
-  }
-  return new Response(JSON.stringify(res), { status: 200 })
-}
 
 export async function POST(req: Request) {
   let user: IUserSchema
@@ -51,19 +32,12 @@ export async function POST(req: Request) {
     const password = bcrypt.hashSync(user.password, 10)
     const newUserData = { ...omit(user, ['password']), password }
     const newUser = await prisma.user.create({ data: newUserData })
-    const uri = `${env.ADMIN_URL}/${Resource.USERS}/${newUser.id}`
     const res: FetchResourceResponse<SanitizedUser> = {
-      data: {
-        type: Resource.USERS,
-        id: newUser.id,
-        attributes: omit(newUser, ['id', 'password']),
-        links: { self: uri },
-      },
+      data: omit(newUser, ['id']),
     }
-    const headers = new Headers()
-    headers.append('Location', uri)
-    return new Response(JSON.stringify(res), { status: 201, headers })
+    return new Response(JSON.stringify(res), { status: 201 })
   } catch (error) {
+    console.error(error)
     let errors: ResponseError = [
       {
         title: 'The backend responded with an error',

@@ -1,7 +1,8 @@
-import { forgotPasswordSchema } from '@/lib/schemas/forgot-password'
-import { FetchResourceResponse, SanitizedUser } from '@/lib/types'
+// import { forgotPasswordSchema } from '@/lib/schemas/forgot-password'
+// import { FetchResourceResponse, SanitizedUser } from '@/lib/types'
 
-export async function POST(req: Request) {
+export async function POST(/*req: Request*/) {
+  /*
   const { email } = forgotPasswordSchema.parse(await req.json())
   const rawUser = await prisma.user.findUnique({ where: { email }, select: { id: true, firstName: true } })
   const passwordMatched = await bcrypt.compare(password, rawUser?.password ?? '')
@@ -11,5 +12,6 @@ export async function POST(req: Request) {
       meta: { token, expires },
     },
   }
-  return new Response(JSON.stringify(res), { status: 200 })
+  */
+  return new Response(JSON.stringify({}), { status: 200 })
 }

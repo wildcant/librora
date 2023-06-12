@@ -5,9 +5,9 @@ import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 import { z } from 'zod'
+import { Pagination } from './_components/Pagination'
 import { Header } from './_components/header/Header'
 import { withTabNavigator } from './_components/withTabNavigator'
-import { Pagination } from './_components/Pagination'
 
 type BookCardProps = CardProps & { book: Book; className?: string }
 function BookCard({ book, className, ...props }: BookCardProps) {
@@ -40,11 +40,11 @@ const searchBooksParamsSchema = z.object({
 })
 type SearchBooksParams = z.infer<typeof searchBooksParamsSchema>
 
-export function encodeSearch(search: string) {
+function encodeSearch(search: string) {
   return search.split(' ').join('-')
 }
 
-export function buildSearchQuery(params: SearchBooksParams): string {
+function buildSearchQuery(params: SearchBooksParams): string {
   let query = '?'
   if (params.search) {
     query += `search=${encodeSearch(params.search)}`
@@ -111,6 +111,7 @@ async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
       <Header className="fixed w-full z-10 bg-white" />
+      {/* @ts-expect-error RSC */}
       <BookList className="pt-14 pb-20" params={searchBooksParamsSchema.parse(searchParams)} />
     </>
   )

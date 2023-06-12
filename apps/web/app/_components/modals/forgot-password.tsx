@@ -1,7 +1,7 @@
 'use client'
 
 import { useCustomModal } from '@/components/Modal'
-import ForgotPasswordForm from '../ForgotPasswordForm'
+import { ForgotPasswordForm } from '../ForgotPasswordForm'
 
 export const useForgotPasswordModal = () =>
   useCustomModal({
