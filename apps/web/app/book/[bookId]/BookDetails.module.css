@@ -3,7 +3,7 @@
 }
 
 .Container {
-  @apply mb-16;
+  @apply mb-16 container;
   display: grid;
   grid-template-areas:
     'book-title'

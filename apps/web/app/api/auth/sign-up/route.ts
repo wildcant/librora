@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import omit from 'lodash/omit'
 
+// TODO: WIP
 export async function POST(req: Request) {
   const data = signUpSchema.parse(await req.json())
   const userExist = await prisma.user.findUnique({ where: { email: data.email } })

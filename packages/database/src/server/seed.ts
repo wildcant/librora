@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { Role, Status, Type } from '@prisma/client'
+import { Role, Status, Type, Country } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
@@ -27,6 +27,13 @@ export const createMock = {
         type: Type.USER,
         role: Role.LENDER_BORROWER_USER,
         status: Status.ACTIVE,
+        location: {
+          create: {
+            country: faker.helpers.enumValue(Country),
+            city: faker.location.city(),
+            zipcode: faker.location.zipCode(),
+          },
+        },
       },
     }),
   book: <TArgs extends CreateFakeArgs<Prisma.BookCreateInput>>(args: TArgs) =>
@@ -55,6 +62,13 @@ const DEFAULT_USERS: Prisma.UserCreateInput[] = [
     role: Role.LENDER_BORROWER_USER,
     password: bcrypt.hashSync('12345', 10),
     status: Status.ACTIVE,
+    location: {
+      create: {
+        city: 'Santa Marta',
+        country: 'CO',
+        zipcode: '470004',
+      },
+    },
   },
   {
     firstName: 'ad',
@@ -64,6 +78,13 @@ const DEFAULT_USERS: Prisma.UserCreateInput[] = [
     role: Role.SUPER_ADMIN,
     password: bcrypt.hashSync('12345', 10),
     status: Status.ACTIVE,
+    location: {
+      create: {
+        city: 'Santa Marta',
+        country: 'CO',
+        zipcode: '470006',
+      },
+    },
   },
 ]
 

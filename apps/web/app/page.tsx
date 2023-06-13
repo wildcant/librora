@@ -8,12 +8,13 @@ import { z } from 'zod'
 import { Pagination } from './_components/Pagination'
 import { Header } from './_components/header/Header'
 import { withTabNavigator } from './_components/withTabNavigator'
+import { Suspense } from 'react'
 
 type BookCardProps = CardProps & { book: Book; className?: string }
 function BookCard({ book, className, ...props }: BookCardProps) {
   return (
     <Card className={cn('rounded-2xl', className)} {...props}>
-      <Link href={`/books/${book.id}`}>
+      <Link href={`/book/${book.id}`}>
         <CardContent className="p-0">
           <div className="flex flex-col cursor-pointer h-full">
             {book.cover && (
@@ -110,11 +111,13 @@ type HomePageProps = {
 async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
-      <Header className="fixed w-full z-10 bg-white" />
-      {/* @ts-expect-error RSC */}
-      <BookList className="pt-14 pb-20" params={searchBooksParamsSchema.parse(searchParams)} />
+      <Header className="fixed w-full z-10 bg-white container" />
+      <Suspense fallback={<div>Loading..</div>}>
+        {/* @ts-expect-error RSC */}
+        <BookList className="pt-14 pb-20 container" params={searchBooksParamsSchema.parse(searchParams)} />
+      </Suspense>
     </>
   )
 }
 
-export default withTabNavigator(HomePage)
+export default withTabNavigator(HomePage)('general')

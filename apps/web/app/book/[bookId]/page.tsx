@@ -1,9 +1,11 @@
 import { Icon } from '@/components/icon'
+import { countries } from 'database/client'
 import { prisma } from 'database/server'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 import s from './BookDetails.module.css'
+import { Location } from './_components/Location'
 
 // TODO: Add default image.
 const defaultBookImage = ''
@@ -15,7 +17,7 @@ type BookDetailsProps = {
 export default async function BookDetails({ params }: BookDetailsProps) {
   const book = await prisma.book.findUnique({
     where: { id: params.bookId },
-    include: { owner: { select: { firstName: true, lastName: true, createdAt: true } } },
+    include: { owner: { select: { firstName: true, lastName: true, location: true, createdAt: true } } },
   })
 
   if (!book) return <div>Not found.</div>
@@ -77,19 +79,17 @@ export default async function BookDetails({ params }: BookDetailsProps) {
         </div>
       )}
 
-      {/* 
       {owner.location ? (
         <div className={s.Location}>
           <h3 className={s.Subtitle}>You&apos;ll meet in</h3>
-          <p className="text-lg font-light">
-            {owner.location.city}, {owner.location.country}
+          <p className="text-lg font-light mb-2">
+            {owner.location.city}, {countries[owner.location.country].country}
           </p>
-          <Location {...owner.location} />
+          <Location country={owner.location.country} />
         </div>
       ) : (
         <></>
       )}
-       */}
     </div>
   )
 }

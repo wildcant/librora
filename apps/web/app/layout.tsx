@@ -1,6 +1,5 @@
 import { Toaster } from '@/components/ui/Toaster'
 import { Merienda, Plus_Jakarta_Sans, Roboto_Slab } from '@next/font/google'
-
 import { getServerSession } from 'next-auth'
 import { Providers } from './Providers'
 import './globals.css'

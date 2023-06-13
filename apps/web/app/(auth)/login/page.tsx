@@ -4,4 +4,4 @@ import { withTabNavigator } from '@/app/_components/withTabNavigator'
 function Login() {
   return <LoginForm />
 }
-export default withTabNavigator(Login)
+export default withTabNavigator(Login)('general')

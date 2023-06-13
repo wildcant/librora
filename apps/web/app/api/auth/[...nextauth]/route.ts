@@ -1,15 +1,20 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
-import NextAuth from 'next-auth'
+import merge from 'lodash/merge'
+import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-/** Docs https://next-auth.js.org/configuration/pages */
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update' && session?.user) {
+        token = merge(token, session.user)
+      }
+
       if (user) {
+        token.id = user.id
         token.type = user.type
         token.email = user.email
         token.emailVerified = user.emailVerified
@@ -19,11 +24,13 @@ const handler = NextAuth({
         token.status = user.status
         token.createdAt = user.createdAt
         token.updatedAt = user.updatedAt
+        token.location = user.location
       }
       return token
     },
     session({ session, token }) {
       if (token && session.user) {
+        session.user.id = token.id
         session.user.type = token.type
         session.user.email = token.email
         session.user.emailVerified = token.emailVerified
@@ -31,6 +38,7 @@ const handler = NextAuth({
         session.user.lastName = token.lastName
         session.user.role = token.role
         session.user.status = token.status
+        session.user.location = token.location
         session.user.createdAt = token.createdAt
         session.user.updatedAt = token.updatedAt
       }
@@ -51,7 +59,10 @@ const handler = NextAuth({
           throw new Error('Invalid credentials')
         }
 
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } })
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+          include: { location: true },
+        })
 
         if (!user || !user?.password) {
           throw new Error('Invalid credentials')
@@ -68,6 +79,8 @@ const handler = NextAuth({
     }),
   ],
   session: { strategy: 'jwt' },
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

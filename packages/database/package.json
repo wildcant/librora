@@ -33,7 +33,7 @@
     "clean": "rimraf .turbo node_modules dist",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
-    "db:push": "prisma db push",
+    "db:push": "prisma db push --force-reset",
     "db:seed": "tsx src/server/seed.ts",
     "dev": "tsup --watch",
     "format": "prisma format",

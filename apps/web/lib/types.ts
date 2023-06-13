@@ -1,9 +1,4 @@
-import { User } from 'database/client'
-
-export enum Resource {
-  USERS = 'users',
-  BOOKS = 'books',
-}
+import { DatabaseTypes } from 'database/client'
 
 export type ExcludeId<T> = Omit<T, 'id'>
 
@@ -12,33 +7,10 @@ export type ResponseError = Array<{
   detail: string
 }>
 
-export type FetchResourceResponse<T, TMeta = { [key: string]: string }> =
-  | {
-      data: {
-        type: Resource
-        id: string
-        attributes: T
-        links?: { self?: string }
-        meta?: TMeta
-      }
-      // included // TODO
-    }
-  | {
-      errors: ResponseError
-    }
+export type ApiResponse<T, TMeta = { [key: string]: string }> =
+  | { data: T; meta?: TMeta }
+  | { errors: ResponseError }
 
-export type FetchResourcesResponse<T> =
-  | {
-      data: Array<{
-        type: Resource
-        id: string
-        attributes: T
-        links?: { self?: string }
-      }>
-      // included // TODO
-    }
-  | {
-      errors: ResponseError
-    }
-
-export type SanitizedUser = Omit<User, 'id' | 'password'>
+export type SanitizedUser = Omit<DatabaseTypes.User, 'password'> & {
+  location: DatabaseTypes.Location | null
+}

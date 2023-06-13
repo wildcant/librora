@@ -1,5 +1,5 @@
 import { IUserSchema, userSchema } from '@/lib/schemas/user'
-import { FetchResourceResponse, ResponseError, SanitizedUser } from '@/lib/types'
+import { ApiResponse, ResponseError, SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import omit from 'lodash/omit'
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const password = bcrypt.hashSync(user.password, 10)
     const newUserData = { ...omit(user, ['password']), password }
     const newUser = await prisma.user.create({ data: newUserData })
-    const res: FetchResourceResponse<SanitizedUser> = {
+    const res: ApiResponse<SanitizedUser> = {
       data: omit(newUser, ['id']),
     }
     return new Response(JSON.stringify(res), { status: 201 })

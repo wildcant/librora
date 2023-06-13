@@ -9,7 +9,6 @@ import world from '@/assets/world.jpg'
 import { Logo } from '@/components/Logo'
 import { useBareModal } from '@/components/Modal'
 import { Icon } from '@/components/icon'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { Calendar } from '@/components/ui/Calendar'
 import {
@@ -19,26 +18,22 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/NavigationMenu'
-import { Popover, PopoverTrigger } from '@/components/ui/Popover'
 import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
-import { PopoverContent } from '@radix-ui/react-popover'
 import type { ToggleGroupImplSingleProps } from '@radix-ui/react-toggle-group'
 import * as ToggleGroup from '@radix-ui/react-toggle-group'
 import format from 'date-fns/format'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
 import debounce from 'lodash/debounce'
-import { Search, Settings2, UserCircle2, XCircle } from 'lucide-react'
-import { signOut, useSession } from 'next-auth/react'
+import { Search, Settings2, XCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DateRange, SelectRangeEventHandler } from 'react-day-picker'
-import { useLoginModal } from '../modals/login'
-import { useSignUpModal } from '../modals/sign-up'
 import s from './Header.module.css'
+import { ProfileMenu } from './ProfileMenu'
 
 const regions = [
   { label: "I'm flexible", img: world, value: 'flexible' },
@@ -281,10 +276,6 @@ type DesktopNavbarProps = {
   className?: string
 }
 function DesktopNavbar({ className }: DesktopNavbarProps) {
-  const { open: openLogin } = useLoginModal()
-  const { open: openSignUp } = useSignUpModal()
-  const session = useSession()
-
   return (
     <div className={cn('flex flex-row w-full justify-between items-start', className)}>
       <Link href="/" className="cursor-pointer">
@@ -293,49 +284,7 @@ function DesktopNavbar({ className }: DesktopNavbarProps) {
 
       <DesktopSearchForm />
 
-      <Popover>
-        <PopoverTrigger className="data-[state=open]:shadow-md rounded-full">
-          {session.status === 'authenticated' ? (
-            <Avatar>
-              <AvatarImage src={session.data.user?.image ?? ''} alt="profile-image" />
-              <AvatarFallback className="bg-gray-800 text-white">
-                {session.data.user?.firstName?.charAt(0)}
-                {session.data.user?.lastName?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <Avatar>
-              <AvatarFallback className="bg-transparent">
-                <UserCircle2 size={32} />
-              </AvatarFallback>
-            </Avatar>
-          )}
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-60 bg-white rounded-2xl shadow-md py-4 border"
-          align="end"
-          sideOffset={10}
-        >
-          <div className="flex flex-col">
-            {session.status === 'authenticated' ? (
-              <>
-                <Button variant="ghost" className="justify-start pl-8" onClick={() => signOut()}>
-                  Log out
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" className="justify-start pl-8" onClick={openLogin}>
-                  Log in
-                </Button>
-                <Button variant="ghost" className="justify-start pl-8" onClick={openSignUp}>
-                  Sign up
-                </Button>
-              </>
-            )}
-          </div>
-        </PopoverContent>
-      </Popover>
+      <ProfileMenu />
     </div>
   )
 }

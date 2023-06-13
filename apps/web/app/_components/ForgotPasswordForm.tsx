@@ -5,7 +5,7 @@ import { DialogFooter } from '@/components/ui/Dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
 import { ForgotPasswordData, forgotPasswordSchema } from '@/lib/schemas/forgot-password'
-import { FetchResourceResponse, SanitizedUser } from '@/lib/types'
+import { ApiResponse, SanitizedUser } from '@/lib/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
@@ -21,7 +21,7 @@ export function ForgotPasswordForm() {
   })
 
   async function forgotPassword(values: ForgotPasswordData) {
-    const response: FetchResourceResponse<SanitizedUser, { token: string; expires: number }> = await (
+    const response: ApiResponse<SanitizedUser, { token: string; expires: number }> = await (
       await fetch('/api/auth/forgot-password', { method: 'post', body: JSON.stringify(values) })
     ).json()
 

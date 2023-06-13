@@ -1,6 +1,6 @@
 import { env } from '@/lib/env'
 import { loginSchema } from '@/lib/schemas/login'
-import { FetchResourceResponse, Resource, ResponseError, SanitizedUser } from '@/lib/types'
+import { ApiResponse, ResponseError, SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import { SignJWT, decodeJwt } from 'jose'
@@ -8,7 +8,7 @@ import omit from 'lodash/omit'
 
 export async function POST(req: Request) {
   const { email, password } = loginSchema.parse(await req.json())
-  const rawUser = await prisma.user.findUnique({ where: { email } })
+  const rawUser = await prisma.user.findUnique({ where: { email }, include: { location: true } })
   const passwordMatched = await bcrypt.compare(password, rawUser?.password ?? '')
 
   if (!rawUser || !passwordMatched) {
@@ -24,13 +24,9 @@ export async function POST(req: Request) {
     .sign(secret)
   const expires = decodeJwt(token).exp as number
 
-  const res: FetchResourceResponse<SanitizedUser, { token: string; expires: number }> = {
-    data: {
-      type: Resource.USERS,
-      id: user.id,
-      attributes: omit(user, ['id']),
-      meta: { token, expires },
-    },
+  const res: ApiResponse<SanitizedUser, { token: string; expires: number }> = {
+    data: user,
+    meta: { token, expires },
   }
   return new Response(JSON.stringify(res), { status: 200 })
 }

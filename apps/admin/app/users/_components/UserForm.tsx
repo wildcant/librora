@@ -1,7 +1,7 @@
 'use client'
 
 import { userSchema, type IUserSchema } from '@/lib/schemas/user'
-import { FetchResourceResponse, ResponseError, SanitizedUser } from '@/lib/types'
+import { ApiResponse, ResponseError, SanitizedUser } from '@/lib/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Role, Status, Type } from 'database/client'
 import { useParams, useRouter } from 'next/navigation'
@@ -41,7 +41,7 @@ export function UserForm(props: UserFormProps) {
   async function createUser(userData: IUserSchema) {
     setSubmitting(true)
     try {
-      const response: FetchResourceResponse<SanitizedUser> = await (
+      const response: ApiResponse<SanitizedUser> = await (
         await fetch('/api/users', { method: 'post', body: JSON.stringify(userData) })
       ).json()
       if ('errors' in response) {
@@ -60,7 +60,7 @@ export function UserForm(props: UserFormProps) {
   async function updateUser(userData: IUserSchema, id: string) {
     setSubmitting(true)
     try {
-      const response: FetchResourceResponse<SanitizedUser> = await (
+      const response: ApiResponse<SanitizedUser> = await (
         await fetch(`/api/users/${id}`, { method: 'PATCH', body: JSON.stringify(userData) })
       ).json()
 
@@ -68,7 +68,6 @@ export function UserForm(props: UserFormProps) {
         setErrors(response.errors)
         return
       }
-
       router.replace('/users')
     } catch (error) {
       console.error(`TODO: Handle error. Unexpected error updating user. ${error}`)
