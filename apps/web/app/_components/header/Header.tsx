@@ -291,7 +291,7 @@ function DesktopNavbar({ className }: DesktopNavbarProps) {
 
 const useMobileSearchFormModal = () =>
   useBareModal({
-    id: 'sear-filters-modal',
+    id: 'search-filters-modal',
     children: <MobileSearchForm />,
     contentProps: { hideClose: true, className: 'bg-[#f7f7f7]', containerClassName: 'p-0' },
   })

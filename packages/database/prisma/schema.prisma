@@ -47,7 +47,7 @@ model User {
 
 model Book {
   id          String   @id @default(cuid())
-  // author Author
+  author      String?
   cover       String?
   date        String
   description String

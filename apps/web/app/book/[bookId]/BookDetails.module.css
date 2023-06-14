@@ -3,9 +3,10 @@
 }
 
 .Container {
-  @apply mb-16 container;
+  @apply mb-16 pt-4 container;
   display: grid;
   grid-template-areas:
+    'back-button'
     'book-title'
     'book-author'
     'book-cover'
@@ -61,7 +62,6 @@
 }
 
 .Booking {
-  @apply mt-6 border-t pt-6;
   grid-area: booking;
 }
 

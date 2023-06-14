@@ -46,6 +46,7 @@ export const createMock = {
         numPages: faker.number.int({ min: 1, max: 1000 }),
         slug: faker.lorem.slug(),
         title: faker.lorem.sentence(),
+        author: faker.person.fullName(),
         owner: {
           create: createMock.user({}),
         },

@@ -18,7 +18,12 @@ export function Location({ country }: LocationProps) {
   })
 
   return (
-    <MapContainer zoom={6} center={latlng} style={{ height: '100%', width: '100%' }} className="rounded-2xl">
+    <MapContainer
+      zoom={6}
+      center={latlng}
+      style={{ height: '100%', width: '100%' }}
+      className="rounded-2xl z-0"
+    >
       <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
       <Marker position={latlng} icon={iconPerson} />
     </MapContainer>

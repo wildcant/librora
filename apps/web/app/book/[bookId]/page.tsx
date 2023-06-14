@@ -1,3 +1,4 @@
+import { GoBackButton } from '@/app/_components/GoBackButton'
 import { Icon } from '@/components/icon'
 import { countries } from 'database/client'
 import { prisma } from 'database/server'
@@ -5,6 +6,7 @@ import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 import s from './BookDetails.module.css'
+import { BookingForm } from './_components/BookingForm'
 import { Location } from './_components/Location'
 
 // TODO: Add default image.
@@ -22,21 +24,18 @@ export default async function BookDetails({ params }: BookDetailsProps) {
 
   if (!book) return <div>Not found.</div>
 
-  const { title, cover, numPages, date, description, owner } = book
+  const { title, cover, numPages, date, description, owner, author } = book
 
   return (
-    <div className={s.Container}>
+    <main className={s.Container}>
+      <GoBackButton className="back-button w-fit" />
       <h1 className={s.Title}>{title}</h1>
 
-      {/* {author && <p className={s.Author}>{author.name}</p>} */}
+      {author && <p className={s.Author}>{author}</p>}
 
       <div className={s.Cover}>
         <Image src={cover ?? defaultBookImage} alt="book image" fill className="rounded-2xl object-cover" />
       </div>
-
-      {/* <div className={s.Booking}>
-        <BookingForm />
-      </div> */}
 
       <div className={s.QuickFacts}>
         <h3 className={s.Subtitle}>Quick Facts</h3>
@@ -61,6 +60,10 @@ export default async function BookDetails({ params }: BookDetailsProps) {
       <div className={s.Description}>
         <h3 className={s.Subtitle}>About this book</h3>
         <p className="text-md font-light">{description}</p>
+      </div>
+
+      <div className={s.Booking}>
+        <BookingForm />
       </div>
 
       {owner && (
@@ -90,6 +93,6 @@ export default async function BookDetails({ params }: BookDetailsProps) {
       ) : (
         <></>
       )}
-    </div>
+    </main>
   )
 }

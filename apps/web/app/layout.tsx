@@ -23,12 +23,12 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${merienda.variable} ${robotoSlab.variable} ${plusJakartaSans.variable}`}>
-      <Providers session={await getServerSession()}>
-        <body>
+      <body>
+        <Providers session={await getServerSession()}>
           {children}
           <Toaster />
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }

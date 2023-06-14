@@ -198,8 +198,9 @@ type UseCustomModalProps = Pick<
 >
 
 export function useCustomModal(props: UseCustomModalProps) {
-  const { openModal, closeModal } = useModalContext()
+  const { openModal, closeModal, modals } = useModalContext()
   return {
+    isOpen: !!modals.find((m) => m.id === props.id),
     open: () => openModal({ variant: 'custom', ...props }),
     close: () => closeModal(props.id),
   }
@@ -211,9 +212,10 @@ type UseBareModalProps = Pick<
 >
 
 export function useBareModal(props: UseBareModalProps) {
-  const { openModal, closeModal } = useModalContext()
+  const { openModal, closeModal, modals } = useModalContext()
 
   return {
+    isOpen: !!modals.find((m) => m.id === props.id),
     open: () => openModal({ variant: 'bare', ...props }),
     close: () => closeModal(props.id),
   }
