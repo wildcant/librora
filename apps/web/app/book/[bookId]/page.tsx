@@ -19,12 +19,15 @@ type BookDetailsProps = {
 export default async function BookDetails({ params }: BookDetailsProps) {
   const book = await prisma.book.findUnique({
     where: { id: params.bookId },
-    include: { owner: { select: { firstName: true, lastName: true, location: true, createdAt: true } } },
+    include: {
+      owner: { select: { firstName: true, lastName: true, location: true, createdAt: true } },
+      reservations: { select: { start: true, end: true } },
+    },
   })
 
   if (!book) return <div>Not found.</div>
 
-  const { title, cover, numPages, date, description, owner, author } = book
+  const { title, cover, numPages, date, description, owner, author, reservations: reservedIntervals } = book
 
   return (
     <main className={s.Container}>
@@ -63,7 +66,7 @@ export default async function BookDetails({ params }: BookDetailsProps) {
       </div>
 
       <div className={s.Booking}>
-        <BookingForm />
+        <BookingForm bookId={book.id} reservedIntervals={reservedIntervals} />
       </div>
 
       {owner && (

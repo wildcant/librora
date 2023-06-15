@@ -4,14 +4,14 @@ import {
   MobileNavigationMenuList,
 } from '@/components/ui/MobileNavigationMenu'
 import { Separator } from '@/components/ui/Separator'
-import { getSession } from '@/lib/get-current-user'
+import { getCurrentUser } from '@/lib/get-current-user'
 import { Book, Fingerprint, UserCircle } from 'lucide-react'
 import { SignOutButton } from '../_components/SignOutButton'
 import { withTabNavigator } from '../_components/withTabNavigator'
 import Link from 'next/link'
 
 async function AccountSettings() {
-  const session = await getSession()
+  const { user } = (await getCurrentUser()) ?? {}
 
   return (
     <main className="container pt-4">
@@ -43,9 +43,9 @@ async function AccountSettings() {
         <h3 className="text-lg font-bold">Account</h3>
         <div>
           <span className="text-sm font-bold">
-            {session?.user?.firstName} {session?.user?.lastName},
+            {user?.firstName} {user?.lastName},
           </span>{' '}
-          {session?.user?.email}
+          {user?.email}
         </div>
 
         <div className="grid grid-cols-4">

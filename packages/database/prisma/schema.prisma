@@ -29,37 +29,40 @@ enum Status {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  firstName     String
-  lastName      String
-  password      String?
-  type          Type      @default(USER)
-  role          Role      @default(LENDER_BORROWER_USER)
-  status        Status    @default(PENDING)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  Book          Book[]
-  location      Location? @relation(fields: [locationId], references: [id])
-  locationId    String
+  id                   String        @id @default(cuid())
+  email                String        @unique
+  emailVerified        DateTime?
+  firstName            String
+  lastName             String
+  password             String?
+  type                 Type          @default(USER)
+  role                 Role          @default(LENDER_BORROWER_USER)
+  status               Status        @default(PENDING)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  Book                 Book[]
+  location             Location?     @relation(fields: [locationId], references: [id])
+  locationId           String
+  lenderReservations   Reservation[] @relation(name: "lender")
+  borrowerReservations Reservation[] @relation(name: "borrower")
 }
 
 model Book {
-  id          String   @id @default(cuid())
-  author      String?
-  cover       String?
-  date        String
-  description String
+  id           String        @id @default(cuid())
+  author       String?
+  cover        String?
+  date         String
+  description  String
   // editorial Editorial
   // language ELanguage
-  numPages    Int
-  owner       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  slug        String
-  title       String
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  numPages     Int
+  owner        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug         String
+  title        String
+  userId       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
 }
 
 // source https://gist.github.com/kyranjamie/646386d5edc174e8b549111572897f81
@@ -324,5 +327,27 @@ model Location {
   zipcode   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User[]
+  user      User[]
+}
+
+enum ReservationStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELED
+}
+
+model Reservation {
+  id         String            @id @default(cuid())
+  start      DateTime
+  end        DateTime
+  book       Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId     String
+  borrower   User              @relation(name: "borrower", fields: [borrowerId], references: [id], onDelete: Cascade)
+  borrowerId String
+  lender     User              @relation(name: "lender", fields: [lenderId], references: [id], onDelete: Cascade)
+  lenderId   String
+  status     ReservationStatus @default(PENDING)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 }

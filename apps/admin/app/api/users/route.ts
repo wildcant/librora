@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const errors: ResponseError = [
       {
         title: 'The backend responded with an error',
-        detail: 'Unexpected when validating user input.',
+        detail: 'Unexpected error when validating user input.',
       },
     ]
 

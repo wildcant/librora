@@ -2,11 +2,16 @@
 
 import { useBareModal } from '@/components/Modal'
 import { Button } from '@/components/ui/Button'
-import { Calendar } from '@/components/ui/Calendar'
+import { Calendar, validateNoOverlap } from '@/components/ui/Calendar'
 import { Form, FormField, FormItem } from '@/components/ui/Form'
+import { useToast } from '@/components/ui/use-toast'
+import { ReservationSchema } from '@/lib/schemas/reservation'
+import { ApiResponse } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Root as Portal } from '@radix-ui/react-portal'
+import { DatabaseTypes } from 'database/client'
+import { Interval } from 'date-fns'
 import differenceInDays from 'date-fns/differenceInDays'
 import format from 'date-fns/format'
 import isSameDay from 'date-fns/isSameDay'
@@ -49,7 +54,8 @@ export function FloatingActions({ children, className }: FloatingActions) {
   )
 }
 
-function BookingDateRangeSelector() {
+type BookingDateRangeSelectorProps = { reservedIntervals: Interval[] }
+function BookingDateRangeSelector({ reservedIntervals }: BookingDateRangeSelectorProps) {
   const { dateRange, setDateRange } = useDateRange()
 
   const formatDateRange = (dateRange?: DateRange) => {
@@ -63,13 +69,19 @@ function BookingDateRangeSelector() {
         <h3 className="font-semibold text-md">Select start date</h3>
         <span>{formatDateRange(dateRange)}</span>
       </div>
-      <Calendar mode="range" selected={dateRange} onSelect={(v) => setDateRange(v)} className="p-0" />
+      <Calendar
+        mode="range"
+        selected={dateRange}
+        onSelect={validateNoOverlap((v) => setDateRange(v), reservedIntervals)}
+        reservedIntervals={reservedIntervals}
+        className="p-0"
+      />
     </>
   )
 }
 
-type MobileBookingFormProps = { className?: string }
-function MobileBookingForm({ className }: MobileBookingFormProps) {
+type MobileBookingFormProps = { className?: string; reservedIntervals: Interval[] }
+function MobileBookingForm({ className, reservedIntervals }: MobileBookingFormProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -78,7 +90,7 @@ function MobileBookingForm({ className }: MobileBookingFormProps) {
 
   const bookingDateRangeModal = useBareModal({
     id: 'booking-date-range-modal',
-    children: <BookingDateRangeSelector />,
+    children: <BookingDateRangeSelector reservedIntervals={reservedIntervals} />,
     contentProps: {
       className: 'top-10 h-full rounded-t-8',
       // Avoid closing the modal when interacting with close/save actions.
@@ -87,7 +99,7 @@ function MobileBookingForm({ className }: MobileBookingFormProps) {
     },
   })
 
-  // Restore date range value from search params.
+  // Restore date range value from search params on mount.
   useEffect(() => {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
@@ -155,8 +167,8 @@ function MobileBookingForm({ className }: MobileBookingFormProps) {
   )
 }
 
-type DesktopBookingFormProps = { className?: string }
-function DesktopBookingForm({ className }: DesktopBookingFormProps) {
+type DesktopBookingFormProps = { className?: string; reservedIntervals: Interval[] }
+function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingFormProps) {
   const router = useRouter()
   const pathname = usePathname()
   const form = useFormContext() as UseFormReturn<BookingSchema>
@@ -193,15 +205,19 @@ function DesktopBookingForm({ className }: DesktopBookingFormProps) {
             <Calendar
               mode="range"
               selected={field.value}
-              onSelect={(...args) => {
+              reservedIntervals={reservedIntervals}
+              onSelect={validateNoOverlap((...args) => {
                 field.onChange(...args)
-                router.replace(
-                  `${pathname}?startDate=${format(dateRange.from, 'yyy-MM-dd')}&endDate=${format(
-                    dateRange.to,
-                    'yyy-MM-dd'
-                  )}`
-                )
-              }}
+                const [currentDateRange] = args
+                if (currentDateRange?.from && currentDateRange?.to) {
+                  router.replace(
+                    `${pathname}?startDate=${format(currentDateRange.from, 'yyy-MM-dd')}&endDate=${format(
+                      currentDateRange.to,
+                      'yyy-MM-dd'
+                    )}`
+                  )
+                }
+              }, reservedIntervals)}
               numberOfMonths={2}
               className="self-center p-0"
               pagedNavigation
@@ -219,8 +235,11 @@ function DesktopBookingForm({ className }: DesktopBookingFormProps) {
   )
 }
 
-export function BookingForm() {
+type BookingFormProps = { bookId: string; reservedIntervals: Interval[] }
+export function BookingForm({ bookId, reservedIntervals }: BookingFormProps) {
   const searchParams = useSearchParams()
+  const { toast } = useToast()
+
   const startDate = searchParams.get('startDate')
   const endDate = searchParams.get('endDate')
   let defaultValues: DefaultValues<BookingSchema> | undefined
@@ -235,16 +254,41 @@ export function BookingForm() {
   const form = useForm<BookingSchema>({ resolver: zodResolver(bookingSchema), defaultValues })
 
   // TODO: submit booking endpoint and handler.
-  const submitBooking = (data: BookingSchema) => {
-    console.log({ data })
+  const submitBooking = async (data: BookingSchema) => {
+    const { from, to } = data.dateRange
+    const reservationData: ReservationSchema = {
+      bookId: bookId,
+      dateRange: { start: from, end: to },
+    }
+    const response = await fetch('/api/reservations', {
+      method: 'post',
+      body: JSON.stringify(reservationData),
+    })
+    const apiResponse: ApiResponse<DatabaseTypes.Reservation> = await response.json()
+
+    if ('errors' in apiResponse) {
+      toast({
+        title: apiResponse.errors[0]?.title,
+        description: apiResponse.errors[0]?.detail,
+      })
+      return
+    }
+
+    if (!response.ok) {
+      toast({
+        title: 'There was a problem',
+        description: 'Please contact an administrator.',
+      })
+      return
+    }
   }
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitBooking)} id="booking-form">
-          <MobileBookingForm className="md:hidden" />
-          <DesktopBookingForm className="hidden md:block" />
+          <MobileBookingForm className="md:hidden" reservedIntervals={reservedIntervals} />
+          <DesktopBookingForm className="hidden md:block" reservedIntervals={reservedIntervals} />
         </form>
       </Form>
     </FormProvider>
