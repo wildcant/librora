@@ -16,7 +16,9 @@ export const withTabNavigator =
     function WithSampleHoc(props: P) {
       return (
         <>
-          <div className="h-[calc(100vh-4rem)] md:h-auto">{component(props) as JSX.Element}</div>
+          <div className="h-[calc(100vh-4rem)] md:h-auto overflow-y-auto">
+            {component(props) as JSX.Element}
+          </div>
           {variant === 'general' ? <GeneralTabNavigator /> : <></>}
           {variant === 'lender' ? <LenderTabNavigator /> : <></>}
         </>

@@ -12,7 +12,14 @@ type CreateFakeArgs<T extends {}> = ExcludeArgs<T> & { overrides?: Partial<T> }
 const createFakeEntity = <T extends {}, TArgs extends CreateFakeArgs<T>>(
   args: TArgs & { json: T }
 ): CheckExclude<TArgs, T, GetEntityPayload<T, TArgs>> => {
-  return args?.exclude ? (merge(omit(args.json, args?.exclude), args.overrides ?? {}) as any) : args?.json
+  let json = args.json
+  if (args.exclude) {
+    json = omit(args.json, args?.exclude) as any
+  }
+  if (args.overrides) {
+    json = merge(json, args.overrides) as any
+  }
+  return json as any
 }
 
 export const createMock = {
@@ -47,9 +54,7 @@ export const createMock = {
         slug: faker.lorem.slug(),
         title: faker.lorem.sentence(),
         author: faker.person.fullName(),
-        owner: {
-          create: createMock.user({}),
-        },
+        owner: args.overrides?.owner ? args.overrides?.owner : { create: createMock.user({}) },
       },
     }),
 }
@@ -91,7 +96,7 @@ const DEFAULT_USERS: Prisma.UserCreateInput[] = [
 
 ;(async () => {
   try {
-    await Promise.all(
+    const [joe] = await Promise.all(
       DEFAULT_USERS.map((user) =>
         prisma.user.upsert({
           where: {
@@ -107,9 +112,11 @@ const DEFAULT_USERS: Prisma.UserCreateInput[] = [
       )
     )
 
+    const joeBooks = range(10).map((_) =>
+      createMock.book({ overrides: { owner: { connect: { id: joe.id } } } })
+    )
     const books = range(100).map((_) => createMock.book({}))
-
-    await Promise.all(books.map((data) => prisma.book.create({ data })))
+    await Promise.all([...books, ...joeBooks].map((data) => prisma.book.create({ data })))
   } catch (error) {
     console.error(error)
     process.exit(1)

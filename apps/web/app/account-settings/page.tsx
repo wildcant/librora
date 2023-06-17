@@ -11,7 +11,7 @@ import { withTabNavigator } from '../_components/withTabNavigator'
 import Link from 'next/link'
 
 async function AccountSettings() {
-  const { user } = (await getCurrentUser()) ?? {}
+  const user = await getCurrentUser()
 
   return (
     <main className="container pt-4">

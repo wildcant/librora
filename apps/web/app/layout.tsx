@@ -1,4 +1,4 @@
-import { Toaster } from '@/components/ui/Toaster'
+import { Toaster } from '@/components/ui/toast/Toaster'
 import { Merienda, Plus_Jakarta_Sans, Roboto_Slab } from '@next/font/google'
 import { getServerSession } from 'next-auth'
 import { Providers } from './Providers'
@@ -22,7 +22,10 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${merienda.variable} ${robotoSlab.variable} ${plusJakartaSans.variable}`}>
+    <html
+      lang="en"
+      className={`overflow-hidden md:overflow-auto ${merienda.variable} ${robotoSlab.variable} ${plusJakartaSans.variable}`}
+    >
       <body>
         <Providers session={await getServerSession()}>
           {children}

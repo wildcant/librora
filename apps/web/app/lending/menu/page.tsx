@@ -17,7 +17,7 @@ function LenderMenu() {
 
         <Separator className="my-4" />
 
-        <h3 className="font-bold text-md">Borrowing</h3>
+        <h3 className="font-bold text-md">Lending</h3>
         <MobileNavigationMenuList>
           <MobileNavigationMenuItem href="/lending/books" icon={Book}>
             Manage your Books

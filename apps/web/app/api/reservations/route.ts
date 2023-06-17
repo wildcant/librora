@@ -6,8 +6,7 @@ import areIntervalsOverlapping from 'date-fns/areIntervalsOverlapping'
 
 export async function POST(req: Request) {
   // Validate user is authenticated.
-  const { user, expires } = (await getCurrentUser()) ?? {}
-  console.log({ user, expires })
+  const user = await getCurrentUser()
   if (!user) {
     const errors: ResponseError = [
       { title: 'Unauthorized', detail: 'Please login in order to request a reservation.' },

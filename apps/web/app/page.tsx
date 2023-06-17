@@ -114,7 +114,7 @@ async function HomePage({ searchParams }: HomePageProps) {
       <Header className="fixed w-full z-10 bg-white container" />
       <Suspense fallback={<div>Loading..</div>}>
         {/* @ts-expect-error RSC */}
-        <BookList className="pt-14 pb-20 container" params={searchBooksParamsSchema.parse(searchParams)} />
+        <BookList className="pt-14 container" params={searchBooksParamsSchema.parse(searchParams)} />
       </Suspense>
     </>
   )
