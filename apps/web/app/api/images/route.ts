@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   const saveFileResponse = await fs.writeFile(`public/books/${image.name}`, buffer).catch((e) => new Error(e))
 
   if (saveFileResponse instanceof Error) {
+    console.error(saveFileResponse)
     const errors: ResponseError = [
       {
         title: 'Server error',
