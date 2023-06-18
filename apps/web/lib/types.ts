@@ -5,6 +5,7 @@ export type ExcludeId<T> = Omit<T, 'id'>
 export type ResponseError = Array<{
   title: string
   detail: string
+  context?: any
 }>
 
 export type ApiResponse<T, TMeta = { [key: string]: string }> =

@@ -9,7 +9,11 @@ export async function POST(req: Request) {
 
   if (saveFileResponse instanceof Error) {
     const errors: ResponseError = [
-      { title: 'Server error', detail: `There was a problem saving you're image please contact Admin.` },
+      {
+        title: 'Server error',
+        detail: `There was a problem saving you're image please contact Admin.`,
+        context: saveFileResponse,
+      },
     ]
     return new Response(JSON.stringify({ errors }), { status: 500 })
   }
