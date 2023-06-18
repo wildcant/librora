@@ -1,6 +1,5 @@
 'use client'
 
-import bookPlaceholder from '@/assets/book-placeholder.webp'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Table } from '@/components/ui/table/Table'
 import { ColumnDef } from '@tanstack/react-table'
@@ -37,7 +36,7 @@ export const columns: ColumnDef<DatabaseTypes.Book>[] = [
         <div className="flex flex-row gap-1">
           <div className="w-1/6 max-w-[56px]">
             <Image
-              src={row.original.cover ?? bookPlaceholder}
+              src={row.original.cover ?? '/books/book-placeholder.webp'}
               alt="book"
               width={640}
               height={480}

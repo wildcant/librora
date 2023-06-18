@@ -20,9 +20,9 @@ const anchorVariants = cva(
       },
       size: {
         default: '',
-        'button-default': 'h-10 py-2 px-4',
-        'button-sm': 'h-9 px-3 rounded-md',
-        'button-lg': 'h-11 px-8 rounded-md',
+        'button-default': 'text-sm h-10 py-2 px-4',
+        'button-sm': 'text-xs h-9 px-3 rounded-md',
+        'button-lg': 'text-md h-11 px-8 rounded-md',
       },
     },
     defaultVariants: {
