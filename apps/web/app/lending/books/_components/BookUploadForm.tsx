@@ -23,9 +23,10 @@ export function BookUploadForm() {
             <>
               <h3 className="text-sm font-bold">Add a photo of your book</h3>
               <span className="text-xs text-gray-500">
-                You'll need one photo to get started. You can add more or make changes later.
+                You&apos;ll need one photo to get started. You can add more or make changes later.
               </span>
               <Dropzone className="flex flex-col gap-2 items-center p-4 mt-4" onUpload={field.onChange}>
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image size={32} />
                 <span className="font-medium">Drag your photo here</span>
                 <span className="text-xs underline font-semibold text-gray-800">Upload from your device</span>

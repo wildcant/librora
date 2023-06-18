@@ -106,6 +106,7 @@ function MobileBookingForm({ className, reservedIntervals }: MobileBookingFormPr
     if (startDate && endDate) {
       setDateRange({ from: new Date(startDate), to: new Date(endDate) })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const formatDateRange = (dateRange: DateRange) => {

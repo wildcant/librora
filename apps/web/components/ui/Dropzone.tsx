@@ -21,39 +21,42 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
     const [image, setImage] = React.useState<string>('')
     const { toast } = useToast()
 
-    const uploadImage = async (file: File): Promise<string | undefined> => {
-      const body = new FormData()
-      body.append('image', file)
-      const response = await fetch('/api/images', { method: 'POST', body })
-      const apiResponse: ApiResponse<{ url: string }> = await response.json()
+    const onDrop = React.useCallback<NonNullable<DropzoneOptions['onDrop']>>(
+      async (acceptedFiles) => {
+        const uploadImage = async (file: File): Promise<string | undefined> => {
+          const body = new FormData()
+          body.append('image', file)
+          const response = await fetch('/api/images', { method: 'POST', body })
+          const apiResponse: ApiResponse<{ url: string }> = await response.json()
 
-      if ('errors' in apiResponse) {
-        if ('errors' in apiResponse) {
-          toast({
-            title: apiResponse.errors[0]?.title,
-            description: apiResponse.errors[0]?.detail,
-          })
-          return
+          if ('errors' in apiResponse) {
+            if ('errors' in apiResponse) {
+              toast({
+                title: apiResponse.errors[0]?.title,
+                description: apiResponse.errors[0]?.detail,
+              })
+              return
+            }
+          }
+
+          if (!response.ok) {
+            toast({
+              title: `There was a problem uploading you're image`,
+              description: 'Please contact an administrator.',
+            })
+            return
+          }
+
+          return apiResponse.data.url
         }
-      }
 
-      if (!response.ok) {
-        toast({
-          title: `There was a problem uploading you're image`,
-          description: 'Please contact an administrator.',
-        })
-        return
-      }
-
-      return apiResponse.data.url
-    }
-
-    const onDrop = React.useCallback<NonNullable<DropzoneOptions['onDrop']>>(async (acceptedFiles) => {
-      const [imageFile] = acceptedFiles
-      if (!imageFile) return
-      const url = await uploadImage(imageFile)
-      setImage(url ?? '')
-    }, [])
+        const [imageFile] = acceptedFiles
+        if (!imageFile) return
+        const url = await uploadImage(imageFile)
+        setImage(url ?? '')
+      },
+      [toast]
+    )
 
     const { getRootProps, getInputProps, fileRejections } = useDropzone({
       onDrop,
