@@ -219,7 +219,6 @@ function DesktopSearchForm({ className }: SearchFormProps) {
                           'yyyy-MM-dd'
                         )}`
                       }
-                      console.log({ query })
                       router.push(query)
                       setOpen(false)
                     }}

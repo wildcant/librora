@@ -15,7 +15,6 @@ export async function POST(req: Request) {
   }
 
   const data = reservationSchema.parse(await req.json())
-  console.log({ data })
 
   // Validate the book exist.
   const book = await prisma.book.findUnique({ where: { id: data.bookId } })

@@ -63,6 +63,8 @@ model Book {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   reservations Reservation[]
+  image        Image         @relation(fields: [imageId], references: [id])
+  imageId      String
 }
 
 // source https://gist.github.com/kyranjamie/646386d5edc174e8b549111572897f81
@@ -350,4 +352,11 @@ model Reservation {
   status     ReservationStatus @default(PENDING)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
+}
+
+model Image {
+  id       String  @id @default(cuid())
+  publicId String?
+  url      String
+  Book     Book[]
 }

@@ -1,14 +1,15 @@
 'use client'
 
+import { Button } from '@/components/ui/Button'
+import { ApiResponse } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { DatabaseTypes } from 'database/client'
+import { AlertCircle, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import * as React from 'react'
 import { DropzoneOptions, useDropzone } from 'react-dropzone'
-import { useToast } from './toast/use-toast'
-import { ApiResponse } from '@/lib/types'
-import { AlertCircle, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import { Spinner } from './Spinner'
+import { useToast } from './toast/use-toast'
 
 export interface DropzoneProps {
   children?: React.ReactNode
@@ -19,18 +20,18 @@ export interface DropzoneProps {
 
 const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
   ({ className, inputClassName, children, onUpload, ...props }, ref) => {
-    const [image, setImage] = React.useState<string>('')
+    const [image, setImage] = React.useState<DatabaseTypes.Image>()
     const [loading, setLoading] = React.useState(false)
     const { toast } = useToast()
 
     const onDrop = React.useCallback<NonNullable<DropzoneOptions['onDrop']>>(
       async (acceptedFiles) => {
         setLoading(true)
-        const uploadImage = async (file: File): Promise<string | undefined> => {
+        const uploadImage = async (file: File): Promise<DatabaseTypes.Image | undefined> => {
           const body = new FormData()
-          body.append('image', file)
+          body.append('file', file)
           const response = await fetch('/api/images', { method: 'POST', body })
-          const apiResponse: ApiResponse<{ url: string }> = await response.json()
+          const apiResponse: ApiResponse<DatabaseTypes.Image> = await response.json()
 
           if ('errors' in apiResponse) {
             if ('errors' in apiResponse) {
@@ -49,17 +50,32 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             })
             return
           }
-          return apiResponse.data.url
+          return apiResponse.data
         }
 
         const [imageFile] = acceptedFiles
         if (!imageFile) return
-        const url = await uploadImage(imageFile)
-        setImage(url ?? '')
+        const img = await uploadImage(imageFile)
+        setImage(img)
         setLoading(false)
       },
       [toast]
     )
+
+    const deleteImage = async (imageId: string) => {
+      setLoading(true)
+      try {
+        await fetch(`/api/images/${imageId}`, { method: 'DELETE' })
+        setImage(undefined)
+      } catch (error) {
+        toast({
+          title: `There was a problem deleting you're image`,
+          description: 'Please contact an administrator.',
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
 
     const { getRootProps, getInputProps, fileRejections } = useDropzone({
       onDrop,
@@ -79,10 +95,12 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             <Button
               variant="unstyled"
               className="absolute top-2 right-2 rounded-full bg-white shadow-sm h-8 w-8 p-1"
+              onClick={() => deleteImage(image.id)}
+              disabled={loading}
             >
               <Trash2 />
             </Button>
-            <Image src={image} alt="Add Image" width={128} height={128} />
+            <Image src={image.url} alt="Add Image" width={128} height={128} />
           </div>
         ) : (
           <div

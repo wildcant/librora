@@ -55,6 +55,7 @@ export const createMock = {
         title: faker.lorem.sentence(),
         author: faker.person.fullName(),
         owner: args.overrides?.owner ? args.overrides?.owner : { create: createMock.user({}) },
+        image: { create: { url: faker.image.urlLoremFlickr({ category: 'books' }) } },
       },
     }),
 }
