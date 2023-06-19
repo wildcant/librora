@@ -8,6 +8,7 @@ import { useToast } from './toast/use-toast'
 import { ApiResponse } from '@/lib/types'
 import { AlertCircle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Spinner } from './Spinner'
 
 export interface DropzoneProps {
   children?: React.ReactNode
@@ -19,10 +20,12 @@ export interface DropzoneProps {
 const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
   ({ className, inputClassName, children, onUpload, ...props }, ref) => {
     const [image, setImage] = React.useState<string>('')
+    const [loading, setLoading] = React.useState(false)
     const { toast } = useToast()
 
     const onDrop = React.useCallback<NonNullable<DropzoneOptions['onDrop']>>(
       async (acceptedFiles) => {
+        setLoading(true)
         const uploadImage = async (file: File): Promise<string | undefined> => {
           const body = new FormData()
           body.append('image', file)
@@ -46,7 +49,6 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             })
             return
           }
-
           return apiResponse.data.url
         }
 
@@ -54,6 +56,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
         if (!imageFile) return
         const url = await uploadImage(imageFile)
         setImage(url ?? '')
+        setLoading(false)
       },
       [toast]
     )
@@ -63,6 +66,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
       accept: { 'image/jpeg': ['.jpeg', '.png'] },
       maxSize: 4000000,
       maxFiles: 1,
+      disabled: loading || !!image,
     })
 
     const [fileRejection] = fileRejections
@@ -81,9 +85,15 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             <Image src={image} alt="Add Image" width={128} height={128} />
           </div>
         ) : (
-          <div {...getRootProps()} className={cn('border border-gray-400 border-dashed h-32', className)}>
+          <div
+            {...getRootProps()}
+            className={cn(
+              'border border-gray-400 border-dashed h-32 flex justify-center items-center',
+              className
+            )}
+          >
             <input className={cn('', inputClassName)} ref={ref} {...props} {...getInputProps()} />
-            {children}
+            {loading ? <Spinner /> : children}
           </div>
         )}
         {error?.message && (
