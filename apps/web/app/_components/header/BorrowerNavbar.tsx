@@ -7,7 +7,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from '@/compon
 import { Separator } from '@/components/ui/Separator'
 import Link from 'next/link'
 
-export function LenderNavbar() {
+export function BorrowerNavbar() {
   return (
     <>
       <div className="flex-row justify-between items-center hidden container md:flex h-16">
@@ -18,10 +18,7 @@ export function LenderNavbar() {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem className="hover:bg-gray-100">
-              <Anchor href="/lending/books">Books</Anchor>
-            </NavigationMenuItem>
-            <NavigationMenuItem className="hover:bg-gray-100">
-              <Anchor href="/lending/reservations">Reservations</Anchor>
+              <Anchor href="/borrowing/reservations">Reservations</Anchor>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>

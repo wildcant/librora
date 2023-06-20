@@ -1,5 +1,5 @@
 import React from 'react'
-import { GeneralTabNavigator, LenderTabNavigator } from './TabNavigator'
+import { BorrowerTabNavigator, LenderTabNavigator } from './TabNavigator'
 
 type PropsAreEqual<P> = (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean
 
@@ -19,7 +19,7 @@ export const withTabNavigator =
           <div className="h-[calc(100vh-4rem)] md:h-auto overflow-y-auto">
             {component(props) as JSX.Element}
           </div>
-          {variant === 'general' ? <GeneralTabNavigator /> : <></>}
+          {variant === 'general' ? <BorrowerTabNavigator /> : <></>}
           {variant === 'lender' ? <LenderTabNavigator /> : <></>}
         </>
       )

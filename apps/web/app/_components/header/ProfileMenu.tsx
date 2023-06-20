@@ -8,6 +8,7 @@ import { PopoverContent } from '@radix-ui/react-popover'
 import { UserCircle2 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useLoginModal } from '../modals/login'
 import { useSignUpModal } from '../modals/sign-up'
 
@@ -15,9 +16,12 @@ export function ProfileMenu() {
   const { open: openLogin } = useLoginModal()
   const { open: openSignUp } = useSignUpModal()
   const session = useSession()
+  const pathname = usePathname()
+  const isLending = pathname.includes('lending')
+
   return (
     <Popover>
-      <PopoverTrigger className="data-[state=open]:shadow-md rounded-full">
+      <PopoverTrigger className="rounded-full h-8 w-8 border flex justify-center items-center data-[state=open]:shadow-md">
         {session.status === 'authenticated' ? (
           <Avatar>
             <AvatarImage src={session.data.user?.image ?? ''} alt="profile-image" />
@@ -34,33 +38,49 @@ export function ProfileMenu() {
           </Avatar>
         )}
       </PopoverTrigger>
-      <PopoverContent className="w-60 bg-white rounded-2xl shadow-md py-4 border" align="end" sideOffset={10}>
+      <PopoverContent className="w-48 bg-white rounded-2xl shadow-md py-2 border" align="end" sideOffset={10}>
         <div className="flex flex-col">
           {session.status === 'authenticated' ? (
             <>
               <Link
                 href="/account-settings"
-                className="justify-start pl-8 py-2 hover:bg-accent hover:text-accent-foreground"
+                className="justify-start pl-4 py-2 hover:bg-accent hover:text-accent-foreground text-xs"
               >
                 Account
               </Link>
               <Link
+                href={`${isLending ? '/lending' : ''}/reservations`}
+                className="justify-start pl-4 py-2 hover:bg-accent hover:text-accent-foreground text-xs"
+              >
+                Reservations
+              </Link>
+              <Link
                 href="/lending/books"
-                className="justify-start pl-8 py-2 hover:bg-accent hover:text-accent-foreground"
+                className="justify-start pl-4 py-2 hover:bg-accent hover:text-accent-foreground text-xs"
               >
                 Manage your Books
               </Link>
               <Separator className="my-1" />
-              <Button variant="ghost" className="justify-start pl-8" onClick={() => signOut()}>
+              {isLending ? (
+                <Link
+                  href="/"
+                  className="justify-start pl-4 py-2 hover:bg-accent hover:text-accent-foreground text-xs"
+                >
+                  Switch to borrowing
+                </Link>
+              ) : (
+                <></>
+              )}
+              <Button variant="ghost" className="justify-start pl-4 text-xs" onClick={() => signOut()}>
                 Log out
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" className="justify-start pl-8" onClick={openLogin}>
+              <Button variant="ghost" className="justify-start pl-4 text-xs" onClick={openLogin}>
                 Log in
               </Button>
-              <Button variant="ghost" className="justify-start pl-8" onClick={openSignUp}>
+              <Button variant="ghost" className="justify-start pl-4 text-xs" onClick={openSignUp}>
                 Sign up
               </Button>
             </>

@@ -148,7 +148,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
                 <NavigationMenuTrigger
                   onPointerMove={(event) => event.preventDefault()}
                   onPointerLeave={(event) => event.preventDefault()}
-                  className="m-0 flex flex-1 flex-col items-start rounded-full py-1 hover:bg-neutral-100"
+                  className="m-0 flex flex-1 flex-col items-start rounded-full py-1"
                 >
                   <span className="text-xs font-light text-neutral-500">Where</span>
                   <span className="text-xs font-light text-neutral-700">
@@ -242,7 +242,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
           <Separator orientation="vertical" className="h-5" />
           <Button
             variant="ghost"
-            className="text-sm rounded-none"
+            className="text-xs rounded-none px-2 py-1 h-8"
             onClick={() => {
               setOpen(true)
               setValue('a')
@@ -253,7 +253,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
           <Separator orientation="vertical" className="h-5" />
           <Button
             variant="ghost"
-            className="text-sm rounded-none"
+            className="text-xs rounded-none px-2 py-1 h-8"
             onClick={() => {
               setOpen(true)
               setValue('b')
@@ -262,7 +262,7 @@ function DesktopSearchForm({ className }: SearchFormProps) {
             {formattedDateRange() ?? 'Any week'}
           </Button>
           <Separator orientation="vertical" className="h-5" />
-          <Button className="w-8 h-8 rounded-full p-2 mx-2">
+          <Button className="w-6 h-6 rounded-full p-1 mx-2">
             <Search size={16} />
           </Button>
         </div>
@@ -276,7 +276,7 @@ type DesktopNavbarProps = {
 }
 function DesktopNavbar({ className }: DesktopNavbarProps) {
   return (
-    <div className={cn('flex flex-row w-full justify-between items-start', className)}>
+    <div className={cn('flex flex-row w-full justify-between items-center h-16', className)}>
       <Link href="/" className="cursor-pointer">
         <Logo />
       </Link>
@@ -434,11 +434,11 @@ type HeaderProps = { className?: string }
 export function Header({ className }: HeaderProps) {
   return (
     <div className={className}>
-      <div className="p-2">
+      <div className="container">
         <DesktopNavbar className="hidden md:flex" />
         <MobileSearchBar className="md:hidden" />
       </div>
-      <Separator />
+      <Separator className="hidden md:block" />
     </div>
   )
 }

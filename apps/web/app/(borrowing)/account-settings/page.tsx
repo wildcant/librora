@@ -6,8 +6,8 @@ import {
 import { Separator } from '@/components/ui/Separator'
 import { getCurrentUser } from '@/lib/get-current-user'
 import { Book, Fingerprint, UserCircle } from 'lucide-react'
-import { SignOutButton } from '../_components/SignOutButton'
-import { withTabNavigator } from '../_components/withTabNavigator'
+import { SignOutButton } from '@/app/_components/SignOutButton'
+import { withTabNavigator } from '@/app/_components/withTabNavigator'
 import Link from 'next/link'
 
 async function AccountSettings() {

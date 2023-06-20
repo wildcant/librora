@@ -1,7 +1,7 @@
 'use client'
 
 import clsx from 'clsx'
-import { Book, LucideIcon, Menu, Search, UserCircle2 } from 'lucide-react'
+import { Book, LucideIcon, Luggage, Menu, Search, UserCircle2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,14 +30,17 @@ function TabScreen({ href, text, icon: Icon }: TabScreenProps) {
   )
 }
 
-export function GeneralTabNavigator() {
+export function BorrowerTabNavigator() {
   const session = useSession()
   return (
     <div className="fixed bottom-0 z-49 flex h-16 w-full justify-center border-t-[1px] border-t-neutral-100 bg-white md:hidden">
       <div className="flex h-full flex-row items-center gap-10">
         <TabScreen href="/" text="Explore" icon={Search} />
         {session.status === 'authenticated' ? (
-          <TabScreen href="/account-settings" text="Profile" icon={UserCircle2} />
+          <>
+            <TabScreen href="/reservations" text="Reservations" icon={Luggage} />
+            <TabScreen href="/account-settings" text="Profile" icon={UserCircle2} />
+          </>
         ) : (
           <TabScreen href="/login" text="Sign in" icon={UserCircle2} />
         )}
@@ -53,6 +56,7 @@ export function LenderTabNavigator() {
     <div className="fixed bottom-0 z-49 flex h-16 w-full justify-center border-t-[1px] border-t-neutral-100 bg-white md:hidden">
       <div className="flex h-full flex-row items-center gap-10">
         <TabScreen href="/lending/books" text="Books" icon={Book} />
+        <TabScreen href="/lending/reservations" text="Reservations" icon={Luggage} />
         <TabScreen href="/lending/menu" text="Menu" icon={Menu} />
       </div>
     </div>
