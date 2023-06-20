@@ -50,7 +50,6 @@ model User {
 model Book {
   id           String        @id @default(cuid())
   author       String?
-  cover        String?
   date         String
   description  String
   // editorial Editorial
