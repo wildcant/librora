@@ -130,6 +130,7 @@ export function Calendar({
       }}
       disabled={disabledRanges}
       modifiersClassNames={{ disabled: 'line-through' }}
+      // TODO: This limits should apply to range calendar only.
       fromMonth={startOfMonth(new Date())}
       toMonth={startOfMonth(subMonths(addYears(new Date(), 2), 1))}
       components={{

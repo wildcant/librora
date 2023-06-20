@@ -3,7 +3,7 @@
 }
 
 .Container {
-  @apply mb-16 pt-4 container;
+  @apply mb-16 pt-4 container h-[calc(100vh-4rem)] overflow-y-auto;
   display: grid;
   grid-template-areas:
     'back-button'

@@ -15,3 +15,7 @@ export type ApiResponse<T, TMeta = { [key: string]: string }> =
 export type SanitizedUser = Omit<DatabaseTypes.User, 'password'> & {
   location: DatabaseTypes.Location | null
 }
+
+export type Book = DatabaseTypes.Book & {
+  image: DatabaseTypes.Image
+}

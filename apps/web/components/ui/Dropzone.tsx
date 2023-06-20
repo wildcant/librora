@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { ApiResponse } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { DatabaseTypes } from 'database/client'
-import { AlertCircle, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import * as React from 'react'
 import { DropzoneOptions, useDropzone } from 'react-dropzone'
@@ -15,11 +15,12 @@ export interface DropzoneProps {
   children?: React.ReactNode
   className?: string
   inputClassName?: string
-  onUpload: (binaryStr: File) => void
+  onUpload: (image?: DatabaseTypes.Image) => void
+  errorMessage?: string
 }
 
-const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
-  ({ className, inputClassName, children, onUpload, ...props }, ref) => {
+const Dropzone = React.forwardRef<HTMLDivElement, DropzoneProps>(
+  ({ className, inputClassName, children, onUpload, errorMessage, ...props }, ref) => {
     const [image, setImage] = React.useState<DatabaseTypes.Image>()
     const [loading, setLoading] = React.useState(false)
     const { toast } = useToast()
@@ -43,7 +44,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             }
           }
 
-          if (!response.ok) {
+          if (!response.ok || !apiResponse.data) {
             toast({
               title: `There was a problem uploading you're image`,
               description: 'Please contact an administrator.',
@@ -54,12 +55,16 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
         }
 
         const [imageFile] = acceptedFiles
-        if (!imageFile) return
+        if (!imageFile) {
+          setLoading(false)
+          return
+        }
         const img = await uploadImage(imageFile)
         setImage(img)
+        onUpload(img)
         setLoading(false)
       },
-      [toast]
+      [toast, onUpload]
     )
 
     const deleteImage = async (imageId: string) => {
@@ -67,6 +72,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
       try {
         await fetch(`/api/images/${imageId}`, { method: 'DELETE' })
         setImage(undefined)
+        onUpload(undefined)
       } catch (error) {
         toast({
           title: `There was a problem deleting you're image`,
@@ -79,17 +85,17 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
 
     const { getRootProps, getInputProps, fileRejections } = useDropzone({
       onDrop,
-      accept: { 'image/jpeg': ['.jpeg', '.png'] },
-      maxSize: 4000000,
+      accept: { 'image/jpeg': ['.jpeg', '.png', '.webp'] },
+      maxSize: 2000000,
       maxFiles: 1,
       disabled: loading || !!image,
     })
 
     const [fileRejection] = fileRejections
-    const error = fileRejection?.errors[0]
+    const fileErrorMessage = fileRejection?.errors[0]?.message
 
     return (
-      <>
+      <div ref={ref}>
         {image ? (
           <div className="h-40 bg-slate-50 flex justify-center relative">
             <Button
@@ -100,7 +106,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
             >
               <Trash2 />
             </Button>
-            <Image src={image.url} alt="Add Image" width={128} height={128} />
+            <Image src={image.url} alt="Add Image" width={128} height={128} className="object-cover" />
           </div>
         ) : (
           <div
@@ -110,16 +116,20 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
               className
             )}
           >
-            <input className={cn('', inputClassName)} ref={ref} {...props} {...getInputProps()} />
+            <input className={cn('', inputClassName)} {...props} {...getInputProps()} />
             {loading ? <Spinner /> : children}
           </div>
         )}
-        {error?.message && (
-          <span className="text-red-700 flex gap-1 items-center">
-            <AlertCircle className="[&>circle]:fill-red-700 [&>line]:stroke-white" /> {error?.message}
-          </span>
+        {(errorMessage || fileErrorMessage) && (
+          <p className={cn('text-xs font-medium text-red-600 flex mt-1')}>
+            <svg className="w-4 h-4 fill-red-700" viewBox="0 0 24 24">
+              <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"></path>
+            </svg>
+
+            {errorMessage || fileErrorMessage}
+          </p>
         )}
-      </>
+      </div>
     )
   }
 )

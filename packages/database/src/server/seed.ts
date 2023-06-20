@@ -47,8 +47,7 @@ export const createMock = {
     createFakeEntity<Prisma.BookCreateInput, TArgs>({
       ...args,
       json: {
-        cover: faker.image.urlLoremFlickr({ category: 'books' }),
-        date: faker.date.past().toString(),
+        date: faker.date.past(),
         description: faker.lorem.paragraph(),
         numPages: faker.number.int({ min: 1, max: 1000 }),
         slug: faker.lorem.slug(),

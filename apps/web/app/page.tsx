@@ -1,6 +1,7 @@
 import { Card, CardContent, CardProps } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
-import { Book, prisma } from 'database/server'
+import { prisma } from 'database/server'
+import { Book } from '@/lib/types'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -17,9 +18,9 @@ function BookCard({ book, className, ...props }: BookCardProps) {
       <Link href={`/book/${book.id}`}>
         <CardContent className="p-0">
           <div className="flex flex-col cursor-pointer h-full">
-            {book.cover && (
+            {book.image && (
               <div className="w-[100%] h-44 lg:h-64 relative">
-                <Image src={book.cover} alt="book" fill className="object-cover rounded-2xl" />
+                <Image src={book.image.url} alt="book" fill className="object-cover rounded-2xl" />
               </div>
             )}
 
@@ -79,7 +80,7 @@ async function BookList({ params, className }: BookListProps) {
   // TODO: Use postgres text search.
   const query = { where: { title: { contains: search } } }
   const [books, count] = await Promise.all([
-    prisma.book.findMany({ ...query, take: BOOK_LIST_PAGE_SIZE, skip }),
+    prisma.book.findMany({ ...query, include: { image: true }, take: BOOK_LIST_PAGE_SIZE, skip }),
     prisma.book.count(query),
   ])
   const hasNextPage = skip + BOOK_LIST_PAGE_SIZE < count

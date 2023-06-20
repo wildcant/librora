@@ -3,9 +3,11 @@ import { BookUploadForm } from '../_components/BookUploadForm'
 
 export default function UploadBook() {
   return (
-    <main className="container my-2">
-      <GoBackButton />
-      <BookUploadForm />
-    </main>
+    <div className="container py-2 h-[100vh] md:h-auto overflow-y-auto">
+      <div>
+        <GoBackButton />
+        <BookUploadForm />
+      </div>
+    </div>
   )
 }

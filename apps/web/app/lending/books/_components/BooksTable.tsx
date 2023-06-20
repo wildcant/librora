@@ -3,13 +3,12 @@
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Table } from '@/components/ui/table/Table'
 import { ColumnDef } from '@tanstack/react-table'
-import { DatabaseTypes } from 'database/client'
-import { Book } from 'database/server'
+import { Book } from '@/lib/types'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const columns: ColumnDef<DatabaseTypes.Book>[] = [
+export const columns: ColumnDef<Book>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -36,7 +35,7 @@ export const columns: ColumnDef<DatabaseTypes.Book>[] = [
         <div className="flex flex-row gap-1">
           <div className="w-1/6 max-w-[56px]">
             <Image
-              src={row.original.cover ?? '/books/book-placeholder.webp'}
+              src={row.original.image.url ?? '/books/book-placeholder.webp'}
               alt="book"
               width={640}
               height={480}

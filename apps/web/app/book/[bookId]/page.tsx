@@ -22,12 +22,13 @@ export default async function BookDetails({ params }: BookDetailsProps) {
     include: {
       owner: { select: { firstName: true, lastName: true, location: true, createdAt: true } },
       reservations: { select: { start: true, end: true } },
+      image: true,
     },
   })
 
   if (!book) return <div>Not found.</div>
 
-  const { title, cover, numPages, date, description, owner, author, reservations: reservedIntervals } = book
+  const { title, image, numPages, date, description, owner, author, reservations: reservedIntervals } = book
 
   return (
     <main className={s.Container}>
@@ -37,7 +38,12 @@ export default async function BookDetails({ params }: BookDetailsProps) {
       {author && <p className={s.Author}>{author}</p>}
 
       <div className={s.Cover}>
-        <Image src={cover ?? defaultBookImage} alt="book image" fill className="rounded-2xl object-cover" />
+        <Image
+          src={image.url ?? defaultBookImage}
+          alt="book image"
+          fill
+          className="rounded-2xl object-cover"
+        />
       </div>
 
       <div className={s.QuickFacts}>

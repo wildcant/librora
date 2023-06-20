@@ -64,12 +64,12 @@ export function LoginForm({ isModal }: LoginFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(login)}>
-        <div>
+        <div className="flex flex-col gap-4">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <div className="mb-4">
+              <div>
                 <FormItem>
                   <FormControl>
                     <Input {...field} />
@@ -84,7 +84,7 @@ export function LoginForm({ isModal }: LoginFormProps) {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <div className="mb-4">
+              <div>
                 <FormItem>
                   <FormControl>
                     <Input {...field} type="password" />
@@ -116,7 +116,7 @@ export function LoginForm({ isModal }: LoginFormProps) {
           />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="mt-6">
           <Button type="submit" variant="default" loading={status === 'loading'}>
             Continue
           </Button>

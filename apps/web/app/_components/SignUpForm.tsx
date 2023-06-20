@@ -33,8 +33,8 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(signUp)}>
-        <div>
-          <div className="mb-4 grid grid-cols-2 gap-1">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-1">
             <FormField
               control={form.control}
               name="firstName"
@@ -70,7 +70,7 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <div className="mb-4">
+              <div>
                 <FormItem>
                   <FormControl>
                     <Input {...field} />
@@ -85,7 +85,7 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <div className="mb-4">
+              <div>
                 <FormItem>
                   <FormControl>
                     <Input {...field} type="password" />
@@ -97,7 +97,8 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
             )}
           />
         </div>
-        <DialogFooter>
+
+        <DialogFooter className="mt-6">
           <Button type="submit" variant="default">
             Continue
           </Button>
