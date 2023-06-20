@@ -134,9 +134,9 @@ function DesktopSearchForm({ className }: SearchFormProps) {
   )
 
   return (
-    <div className={cn(className, { 'h-40': open })}>
+    <div className={cn(className, { 'h-40 w-full': open })}>
       {open ? (
-        <div className="h-full flex items-end">
+        <div className="h-full flex items-end w-full bg-white rounded-b-full shadow-2xl">
           <NavigationMenu
             value={value}
             onValueChange={(v) => {
