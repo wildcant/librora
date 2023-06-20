@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       imageId: bookData.image,
       title: bookData.title,
       description: bookData.description,
-      date: bookData.date,
+      date: bookData.date.toISOString(),
       numPages: bookData.numPages,
       slug: bookData.title.split(' ').join('-'),
       userId: user.id,
