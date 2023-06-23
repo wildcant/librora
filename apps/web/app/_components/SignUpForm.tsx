@@ -26,13 +26,9 @@ export default function SignUpForm({ isModal }: SignUpFormProps) {
     /* */
   })
 
-  function signUp(formData: SignUpSchema) {
-    console.log({ formData })
-  }
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(signUp)}>
+      <form onSubmit={form.handleSubmit(console.info)}>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-1">
             <FormField

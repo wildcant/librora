@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/Breadcrumb'
-import { GoBackButton } from '../_components/GoBackButton'
+import { GoBackButton } from '../../_components/GoBackButton'
 import { PersonalInfo } from './_components/PersonalInfo'
 
 export default function PersonalInfoPage() {

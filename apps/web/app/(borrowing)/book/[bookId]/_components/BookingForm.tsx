@@ -3,7 +3,9 @@
 import { useBareModal } from '@/components/Modal'
 import { Button } from '@/components/ui/Button'
 import { Calendar, validateNoOverlap } from '@/components/ui/Calendar'
-import { Form, FormField, FormItem } from '@/components/ui/Form'
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/Form'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
+import { Separator } from '@/components/ui/Separator'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { ReservationSchema } from '@/lib/schemas/reservation'
 import { ApiResponse } from '@/lib/types'
@@ -17,9 +19,9 @@ import format from 'date-fns/format'
 import isSameDay from 'date-fns/isSameDay'
 import isSameMonth from 'date-fns/isSameMonth'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { DateRange } from 'react-day-picker'
-import { DefaultValues, FormProvider, UseFormReturn, useForm, useFormContext } from 'react-hook-form'
+import { FormProvider, UseFormReturn, useForm, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 import { create } from 'zustand'
 
@@ -153,7 +155,7 @@ function MobileBookingForm({ className, reservedIntervals }: MobileBookingFormPr
               <Button className="text-xs !p-0" variant="link" underline onClick={bookingDateRangeModal.open}>
                 {formatDateRange(dateRange)}
               </Button>
-              <Button type="submit" form="booking-form">
+              <Button type="submit" form="booking-form" loading={form.formState.isSubmitting}>
                 Reserve
               </Button>
             </>
@@ -172,11 +174,30 @@ type DesktopBookingFormProps = { className?: string; reservedIntervals: Interval
 function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingFormProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const [open, setOpen] = useState(false)
   const form = useFormContext() as UseFormReturn<BookingSchema>
-
   let label
   let title = 'When do you want to have it'
   const dateRange = form.watch('dateRange')
+
+  const searchParams = useSearchParams()
+  const startDate = searchParams.get('startDate')
+  const endDate = searchParams.get('endDate')
+  let defaultValues: BookingSchema | undefined
+  if (startDate && endDate) {
+    defaultValues = {
+      dateRange: {
+        from: new Date(startDate),
+        to: new Date(endDate),
+      },
+    }
+  }
+
+  useEffect(() => {
+    if (defaultValues?.dateRange) {
+      form.setValue('dateRange', defaultValues.dateRange)
+    }
+  }, [defaultValues?.dateRange.to.toString(), defaultValues?.dateRange.from.toString()])
 
   if (dateRange?.from && dateRange?.to) {
     const { from: start, to: end } = dateRange
@@ -193,8 +214,13 @@ function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingForm
     }
   }
 
+  const handleClearDateRange = () => {
+    form.reset()
+    router.replace(pathname)
+  }
+
   return (
-    <div className={className}>
+    <div className={cn('border shadow-md rounded-md p-6 max-w-lg flex flex-col gap-4 w-full', className)}>
       <h3>{title}</h3>
       {label ? <p className="text-lg font-light">{label}</p> : <></>}
 
@@ -203,32 +229,74 @@ function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingForm
         name="dateRange"
         render={({ field }) => (
           <FormItem className="flex flex-col border-none">
-            <Calendar
-              mode="range"
-              selected={field.value}
-              reservedIntervals={reservedIntervals}
-              onSelect={validateNoOverlap((...args) => {
-                field.onChange(...args)
-                const [currentDateRange] = args
-                if (currentDateRange?.from && currentDateRange?.to) {
-                  router.replace(
-                    `${pathname}?startDate=${format(currentDateRange.from, 'yyy-MM-dd')}&endDate=${format(
-                      currentDateRange.to,
-                      'yyy-MM-dd'
-                    )}`
-                  )
-                }
-              }, reservedIntervals)}
-              numberOfMonths={2}
-              className="self-center p-0"
-              pagedNavigation
-            />
+            <FormItem className="border-0">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <FormControl className="peer">
+                    <div className="border border-solid border-1 rounded-md border-gray-400 flex flex-row w-full">
+                      <Button
+                        variant="unstyled"
+                        className="flex flex-col w-1/2"
+                        type="button"
+                        onClick={() => setOpen(true)}
+                      >
+                        <span className="text-xs">Start Date</span>
+                        <span className="text-gray-400 text-xs">
+                          {field.value?.from ? format(field.value.from, 'PPP') : 'Add date'}
+                        </span>
+                      </Button>
+                      <Separator orientation="vertical" className="h-10 bg-gray-400" />
+                      <Button
+                        variant="unstyled"
+                        className="flex flex-col w-1/2"
+                        type="button"
+                        onClick={() => setOpen(true)}
+                      >
+                        <span className="text-xs">End Date</span>
+                        <span className="text-gray-400 text-xs">
+                          {field.value?.to ? format(field.value.to, 'PPP') : 'Add date'}
+                        </span>
+                      </Button>
+                    </div>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-4" align="start">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-4">Select dates</h3>
+                    <Calendar
+                      mode="range"
+                      selected={field.value}
+                      reservedIntervals={reservedIntervals}
+                      onSelect={validateNoOverlap((...args) => {
+                        field.onChange(...args)
+                        const [currentDateRange] = args
+                        if (currentDateRange?.from && currentDateRange?.to) {
+                          router.replace(
+                            `${pathname}?startDate=${format(
+                              currentDateRange.from,
+                              'yyy-MM-dd'
+                            )}&endDate=${format(currentDateRange.to, 'yyy-MM-dd')}`
+                          )
+                          setOpen(false)
+                        }
+                      }, reservedIntervals)}
+                      numberOfMonths={2}
+                      className="self-center p-0"
+                      pagedNavigation
+                    />
+                    <Button className="text-xs !p-0" variant="link" underline onClick={handleClearDateRange}>
+                      Clear dates
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </FormItem>
           </FormItem>
         )}
       />
 
       <div className="block self-end">
-        <Button className="w-48" type="submit">
+        <Button className="w-48" type="submit" loading={form.formState.isSubmitting}>
           Reserve
         </Button>
       </div>
@@ -238,21 +306,9 @@ function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingForm
 
 type BookingFormProps = { bookId: string; reservedIntervals: Interval[] }
 export function BookingForm({ bookId, reservedIntervals }: BookingFormProps) {
-  const searchParams = useSearchParams()
   const { toast } = useToast()
-
-  const startDate = searchParams.get('startDate')
-  const endDate = searchParams.get('endDate')
-  let defaultValues: DefaultValues<BookingSchema> | undefined
-  if (startDate && endDate) {
-    defaultValues = {
-      dateRange: {
-        from: new Date(startDate),
-        to: new Date(endDate),
-      },
-    }
-  }
-  const form = useForm<BookingSchema>({ resolver: zodResolver(bookingSchema), defaultValues })
+  const router = useRouter()
+  const form = useForm<BookingSchema>({ resolver: zodResolver(bookingSchema) })
 
   // TODO: submit booking endpoint and handler.
   const submitBooking = async (data: BookingSchema) => {
@@ -282,14 +338,19 @@ export function BookingForm({ bookId, reservedIntervals }: BookingFormProps) {
       })
       return
     }
+    router.replace('/reservations')
   }
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(submitBooking)} id="booking-form">
+        <form
+          onSubmit={form.handleSubmit(submitBooking)}
+          id="booking-form"
+          className="md:flex md:justify-start lg:justify-center lg:w-full"
+        >
           <MobileBookingForm className="md:hidden" reservedIntervals={reservedIntervals} />
-          <DesktopBookingForm className="hidden md:block" reservedIntervals={reservedIntervals} />
+          <DesktopBookingForm className="hidden md:flex" reservedIntervals={reservedIntervals} />
         </form>
       </Form>
     </FormProvider>

@@ -49,7 +49,7 @@ function NameForm({ handleClose }: NameFormProps) {
   const saveName = async (formData: NameSchema) => {
     setLoading(true)
     if (!user?.id) {
-      console.log('TODO: Handle unexpected error in name form.')
+      console.error('TODO: Handle unexpected error in name form.')
       setLoading(false)
       return
     }
@@ -144,7 +144,7 @@ function AddressForm({ handleClose }: AddressFormProps) {
   const saveAddress = async (formData: LocationSchema) => {
     setLoading(true)
     if (!user?.id) {
-      console.log('TODO: Handle unexpected error in name form.')
+      console.error('TODO: Handle unexpected error in name form.')
       setLoading(false)
       return
     }

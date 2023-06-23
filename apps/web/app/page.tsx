@@ -1,39 +1,10 @@
-import { Card, CardContent, CardProps } from '@/components/ui/Card'
-import { cn } from '@/lib/utils'
 import { prisma } from 'database/server'
-import { Book } from '@/lib/types'
-import format from 'date-fns/format'
-import Image from 'next/image'
-import Link from 'next/link'
+import { Suspense } from 'react'
 import { z } from 'zod'
 import { Pagination } from './_components/Pagination'
 import { Header } from './_components/header/Header'
 import { withTabNavigator } from './_components/withTabNavigator'
-import { Suspense } from 'react'
-
-type BookCardProps = CardProps & { book: Book; className?: string }
-function BookCard({ book, className, ...props }: BookCardProps) {
-  return (
-    <Card className={cn('rounded-2xl', className)} {...props}>
-      <Link href={`/book/${book.id}`}>
-        <CardContent className="p-0">
-          <div className="flex flex-col cursor-pointer h-full">
-            {book.image && (
-              <div className="w-[100%] h-44 lg:h-64 relative">
-                <Image src={book.image.url} alt="book" fill className="object-cover rounded-2xl" />
-              </div>
-            )}
-
-            <div className="p-1 flex flex-1 flex-col justify-between lg:p-2">
-              <h1 className="text-sm font-semibold lg:text-md">{book.title}</h1>
-              <h5 className="text-sm font-bold text-secondary-600">{format(new Date(book.date), 'yyyy')}</h5>
-            </div>
-          </div>
-        </CardContent>
-      </Link>
-    </Card>
-  )
-}
+import { BookCard } from './_components/BookCard'
 
 const BOOK_LIST_PAGE_SIZE = 8
 const searchBooksParamsSchema = z.object({
@@ -88,7 +59,7 @@ async function BookList({ params, className }: BookListProps) {
 
   return (
     <div className={className}>
-      <div className="md:grid sm:grid-cols-2 sm:gap-10 lg:grid lg:grid-cols-4 lg:gap-20">
+      <div className="md:grid sm:grid-cols-2 sm:gap-10 lg:grid lg:grid-cols-4 lg:gap-6">
         {books.map((book) => (
           <BookCard key={book.id} book={book} />
         ))}
