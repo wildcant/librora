@@ -18,6 +18,10 @@ module.exports = {
       },
     },
     extend: {
+      boxShadow: {
+        'r-md':
+          'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0,0,0,0.1) 15px 0px 30px -10px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

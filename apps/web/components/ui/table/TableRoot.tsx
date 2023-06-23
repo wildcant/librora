@@ -39,7 +39,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
-      className={cn('border-b transition-colors data-[state=selected]:bg-muted', className)}
+      className={cn('border-b transition-colors', className, 'data-[state=selected]:bg-muted')}
       {...props}
     />
   )
@@ -128,10 +128,21 @@ function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
   )
 }
 
+const TableStickyCell = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('flex gap-2 items-center md:border-r md:shadow-r-md md:px-2 md:py-2', className)}
+      {...props}
+    />
+  )
+)
+
 export {
   TableBody,
   TableCaption,
   TableCell,
+  TableStickyCell,
   TableFooter,
   TableHead,
   TableHeader,

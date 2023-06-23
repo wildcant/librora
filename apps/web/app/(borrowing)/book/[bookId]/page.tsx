@@ -9,9 +9,6 @@ import s from './BookDetails.module.css'
 import { BookingForm } from './_components/BookingForm'
 import { Location } from './_components/Location'
 
-// TODO: Add default image.
-const defaultBookImage = ''
-
 type BookDetailsProps = {
   params: { bookId: string }
 }
@@ -39,7 +36,7 @@ export default async function BookDetails({ params }: BookDetailsProps) {
 
       <div className={s.Cover}>
         <Image
-          src={image.url ?? defaultBookImage}
+          src={image.url ?? '/books/book-placeholder.webp'}
           alt="book image"
           fill
           className="rounded-2xl object-cover"

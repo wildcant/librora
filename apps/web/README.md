@@ -12,3 +12,5 @@ TODOs
 
 - [ ] Hide auth only pages.
 - [ ] Reservation pages.
+- [ ] Add server side pagination pages with tables.
+- [ ] Reservation flow, status transitions, lender/borrower actions in res tables.

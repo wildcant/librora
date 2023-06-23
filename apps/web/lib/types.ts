@@ -19,3 +19,14 @@ export type SanitizedUser = Omit<DatabaseTypes.User, 'password'> & {
 export type Book = DatabaseTypes.Book & {
   image: DatabaseTypes.Image
 }
+
+export type Reservation = DatabaseTypes.Reservation & {
+  book: DatabaseTypes.Book & {
+    image: {
+      url: string
+    }
+  }
+  lender: DatabaseTypes.User & {
+    location: DatabaseTypes.Location | null
+  }
+}

@@ -41,14 +41,21 @@ export function Table<TData, TValue>({ columns, data, className }: DataTableProp
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const { columnDef } = header.column
                   return (
                     <TableHead
                       key={header.id}
-                      className={cn({ 'hidden md:table-cell': header.column.columnDef.meta?.hiddenMobile })}
+                      className={cn(
+                        {
+                          'hidden md:table-cell': columnDef.meta?.hiddenMobile,
+                          'md:sticky md:bg-white left-0 md:border-r md:py-2 md:px-2 !md:shadow-r-md':
+                            columnDef.meta?.stickyLeft,
+                        },
+                        columnDef.meta?.headerClassName
+                      )}
+                      style={{ width: header.getSize() }}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder ? null : flexRender(columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}
@@ -60,14 +67,25 @@ export function Table<TData, TValue>({ columns, data, className }: DataTableProp
               table.getRowModel().rows.map((row) => {
                 return (
                   <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={cn({ 'hidden md:table-cell': cell.column.columnDef.meta?.hiddenMobile })}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const { columnDef } = cell.column
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(
+                            {
+                              'hidden md:table-cell': columnDef.meta?.hiddenMobile,
+                              'md:sticky md:bg-white md:left-0 md:p-0': columnDef.meta?.stickyLeft,
+                            },
+                            columnDef.meta?.className,
+                            { '!bg-muted': row.getIsSelected() }
+                          )}
+                          style={{ width: cell.column.getSize(), minWidth: cell.column.getSize() }}
+                        >
+                          {flexRender(columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
                 )
               })

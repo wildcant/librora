@@ -7,10 +7,11 @@ import { Book } from '@/lib/types'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
+import { TableStickyCell } from '@/components/ui/table/TableRoot'
 
 export const columns: ColumnDef<Book>[] = [
   {
-    id: 'select',
+    id: 'selectCoverTitle',
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -19,35 +20,32 @@ export const columns: ColumnDef<Book>[] = [
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: 'coverTitle',
-    cell: ({ row }) => (
-      <Link href={`/lending/books/${row.original.id}`}>
-        <div className="flex flex-row gap-1">
-          <div className="w-1/6 max-w-[56px]">
-            <Image
-              src={row.original.image.url ?? '/books/book-placeholder.webp'}
-              alt="book"
-              width={640}
-              height={480}
-              className="object-cover rounded-md"
-            />
+      <TableStickyCell>
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select reservation row"
+        />
+        <Link href={`/lending/books/${row.original.id}`}>
+          <div className="flex flex-row gap-1 items-center">
+            <div className="w-10 h-10">
+              <Image
+                src={row.original.image.url ?? '/books/book-placeholder.webp'}
+                alt="book"
+                width={640}
+                height={480}
+                className="object-cover rounded-md h-10 "
+              />
+            </div>
+            <div className="w-5/6 md:max-w-xs">
+              <span className="line-clamp-2 text-xs">{row.original.title}</span>
+            </div>
           </div>
-          <div className="w-5/6 md:max-w-xs">
-            <span className="line-clamp-2 text-xs">{row.original.title}</span>
-          </div>
-        </div>
-      </Link>
+        </Link>
+      </TableStickyCell>
     ),
+    size: 200,
+    meta: { stickyLeft: true },
   },
   {
     header: 'Pages',
