@@ -8,9 +8,13 @@ About cloudinary unsigned upload
 - [Check the cloudinary postman](https://www.postman.com/cloudinaryteam/workspace)
 - Upload preset must be specified when using unsigned upload See [Api reference](https://cloudinary.com/documentation/image_upload_api_reference)
 
-TODOs
+### TODOs
 
 - [ ] Hide auth only pages.
 - [ ] Reservation pages.
 - [ ] Add server side pagination pages with tables.
 - [ ] Reservation flow, status transitions, lender/borrower actions in res tables.
+
+### Issues
+
+Check https://github.com/microsoft/TypeScript/issues/47663#issuecomment-1519138189, currently having the issue in hooks after importing lodash.
