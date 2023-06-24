@@ -1,18 +1,14 @@
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { cloudinary } from '@/lib/cloudinary'
-import { ResponseError } from '@/lib/types'
 import { prisma } from 'database/server'
 
 export async function DELETE(_req: Request, { params }: { params: { imageId: string } }) {
   const image = await prisma.image.findUnique({ where: { id: params.imageId } })
   if (!image) {
-    const errors: ResponseError = [
-      {
-        title: 'Bad user input',
-        detail: `Image with id ${params.imageId} doesn't exist.`,
-      },
-    ]
-
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.BAD_REQUEST, {
+      errors: [{ title: 'Bad user input', description: `Image with id ${params.imageId} doesn't exist.` }],
+    })
   }
 
   await prisma.image.delete({ where: { id: image.id } })
@@ -21,5 +17,5 @@ export async function DELETE(_req: Request, { params }: { params: { imageId: str
     await cloudinary.destroy(image.publicId)
   }
 
-  return new Response(JSON.stringify(''), { status: 200 })
+  return apiResponse(StatusCode.OK)
 }

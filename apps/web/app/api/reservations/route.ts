@@ -1,6 +1,7 @@
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { getCurrentUser } from '@/lib/get-current-user'
 import { reservationSchema } from '@/lib/schemas/reservation'
-import { ResponseError } from '@/lib/types'
 import { prisma } from 'database/server'
 import areIntervalsOverlapping from 'date-fns/areIntervalsOverlapping'
 
@@ -8,10 +9,9 @@ export async function POST(req: Request) {
   // Validate user is authenticated.
   const user = await getCurrentUser()
   if (!user) {
-    const errors: ResponseError = [
-      { title: 'Unauthorized', detail: 'Please login in order to request a reservation.' },
-    ]
-    return new Response(JSON.stringify({ errors }), { status: 401 })
+    return apiResponse(StatusCode.UNAUTHORIZED, {
+      errorMessage: 'Please login in order to request a reservation.',
+    })
   }
 
   const data = reservationSchema.parse(await req.json())
@@ -19,18 +19,14 @@ export async function POST(req: Request) {
   // Validate the book exist.
   const book = await prisma.book.findUnique({ where: { id: data.bookId } })
   if (!book) {
-    const errors: ResponseError = [
-      { title: 'Not found', detail: `Book with id ${data.bookId} was not found.` },
-    ]
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.NOT_FOUND, { errorMessage: `Book with id ${data.bookId} was not found.` })
   }
 
   // Validate user is not trying to reserve his own book.
   if (book.userId === user.id) {
-    const errors: ResponseError = [
-      { title: 'Invalid user input', detail: `You can not reserve your own books.` },
-    ]
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.BAD_REQUEST, {
+      errors: [{ title: 'Invalid user input', description: `You can not reserve your own books.` }],
+    })
   }
 
   // Validate book is available.
@@ -39,10 +35,9 @@ export async function POST(req: Request) {
     select: { start: true, end: true },
   })
   if (reservedIntervals.some((reservedSlot) => areIntervalsOverlapping(reservedSlot, data.dateRange))) {
-    const errors: ResponseError = [
-      { title: 'Invalid user input', detail: 'Book is not available during this date range.' },
-    ]
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.BAD_REQUEST, {
+      errors: [{ title: 'Invalid user input', description: 'Book is not available during this date range.' }],
+    })
   }
 
   const response = await prisma.book
@@ -63,11 +58,12 @@ export async function POST(req: Request) {
 
   if (response instanceof Error) {
     console.error(response)
-    const errors: ResponseError = [
-      { title: 'Internal server error', detail: "There was a problem processing you're request." },
-    ]
-    return new Response(JSON.stringify({ errors }), { status: 500 })
+    return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
+      errors: [
+        { title: 'Internal server error', description: "There was a problem processing you're request." },
+      ],
+    })
   }
 
-  return new Response(JSON.stringify({ book: response }), { status: 200 })
+  return apiResponse(StatusCode.OK)
 }

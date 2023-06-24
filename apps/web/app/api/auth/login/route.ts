@@ -1,6 +1,8 @@
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { env } from '@/lib/env'
 import { loginSchema } from '@/lib/schemas/login'
-import { ApiResponse, ResponseError, SanitizedUser } from '@/lib/types'
+import { SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import { SignJWT, decodeJwt } from 'jose'
@@ -12,8 +14,9 @@ export async function POST(req: Request) {
   const passwordMatched = await bcrypt.compare(password, rawUser?.password ?? '')
 
   if (!rawUser || !passwordMatched) {
-    const errors: ResponseError = [{ title: 'Invalid user input', detail: 'Invalid email or password.' }]
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.BAD_REQUEST, {
+      errors: [{ title: 'Invalid user input', description: 'Invalid email or password.' }],
+    })
   }
 
   const user = omit(rawUser, ['password'])
@@ -24,9 +27,8 @@ export async function POST(req: Request) {
     .sign(secret)
   const expires = decodeJwt(token).exp as number
 
-  const res: ApiResponse<SanitizedUser, { token: string; expires: number }> = {
+  return apiResponse<SanitizedUser, { token: string; expires: number }>(StatusCode.OK, {
     data: user,
     meta: { token, expires },
-  }
-  return new Response(JSON.stringify(res), { status: 200 })
+  })
 }

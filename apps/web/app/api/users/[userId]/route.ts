@@ -1,12 +1,15 @@
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { userSchema } from '@/lib/schemas/user'
-import { ResponseError } from '@/lib/types'
+import { SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import omit from 'lodash/omit'
 
 export async function PATCH(req: Request, { params }: { params: { userId: string } }) {
   const user = await prisma.user.findUnique({ where: { id: params.userId } })
-  if (!user) return new Response(JSON.stringify({}), { status: 404 })
+  if (!user)
+    return apiResponse(StatusCode.NOT_FOUND, { errorMessage: `User with id ${params.userId} was not found.` })
 
   try {
     const formData = await req.json()
@@ -21,16 +24,14 @@ export async function PATCH(req: Request, { params }: { params: { userId: string
         ...omit(data, ['location']),
         ...(data?.location ? { location: { update: data.location } } : {}),
       },
+      include: { location: true },
     })
-    return new Response(JSON.stringify(updatedUser), { status: 200 })
+
+    return apiResponse<SanitizedUser>(StatusCode.OK, { data: omit(updatedUser, ['password']) })
   } catch (error) {
     console.error(error)
-    const res: ResponseError = [
-      {
-        title: 'The backend responded with an error',
-        detail: error instanceof Error ? error.message : 'Was not able to delete the user',
-      },
-    ]
-    return new Response(JSON.stringify(res), { status: 500 })
+    return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
+      errorMessage: 'There was a problem in the server. Please contact admin.',
+    })
   }
 }

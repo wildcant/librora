@@ -48,8 +48,7 @@ export function Table<TData, TValue>({ columns, data, className }: DataTableProp
                       className={cn(
                         {
                           'hidden md:table-cell': columnDef.meta?.hiddenMobile,
-                          'md:sticky md:bg-white left-0 md:border-r md:py-2 md:px-2 !md:shadow-r-md':
-                            columnDef.meta?.stickyLeft,
+                          'md:sticky md:bg-white left-0 !p-0': columnDef.meta?.stickyLeft,
                         },
                         columnDef.meta?.headerClassName
                       )}
@@ -78,9 +77,9 @@ export function Table<TData, TValue>({ columns, data, className }: DataTableProp
                               'md:sticky md:bg-white md:left-0 md:p-0': columnDef.meta?.stickyLeft,
                             },
                             columnDef.meta?.className,
-                            { '!bg-muted': row.getIsSelected() }
+                            { '!bg-muted': row.getIsSelected() },
+                            `md:w-[${cell.column.getSize()}px] md:max-w-[${cell.column.getSize()}px] md:min-w-[${cell.column.getSize()}px]`
                           )}
-                          style={{ width: cell.column.getSize(), minWidth: cell.column.getSize() }}
                         >
                           {flexRender(columnDef.cell, cell.getContext())}
                         </TableCell>

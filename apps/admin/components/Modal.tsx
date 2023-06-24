@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext } from '@librora/hooks'
+import { createContext } from 'hooks'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 
 type ModalProps = {

@@ -7,7 +7,7 @@ import { Book } from '@/lib/types'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
-import { TableStickyCell } from '@/components/ui/table/TableRoot'
+import { TableCellSticky } from '@/components/ui/table/TableRoot'
 
 export const columns: ColumnDef<Book>[] = [
   {
@@ -20,7 +20,7 @@ export const columns: ColumnDef<Book>[] = [
       />
     ),
     cell: ({ row }) => (
-      <TableStickyCell>
+      <TableCellSticky>
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -42,7 +42,7 @@ export const columns: ColumnDef<Book>[] = [
             </div>
           </div>
         </Link>
-      </TableStickyCell>
+      </TableCellSticky>
     ),
     size: 200,
     meta: { stickyLeft: true },

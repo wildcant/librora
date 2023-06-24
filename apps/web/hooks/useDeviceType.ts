@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@librora/hooks'
+import { useMediaQuery } from 'hooks'
 import { screens } from 'tailwindcss/defaultTheme'
 
 export function useDeviceType() {

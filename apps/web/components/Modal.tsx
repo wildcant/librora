@@ -3,7 +3,7 @@
 import { Button, ButtonProps } from '@/components/ui/Button'
 import { Dialog, DialogContent, DialogContentProps, DialogHeader, DialogProps } from '@/components/ui/Dialog'
 import { cn } from '@/lib/utils'
-import { createContext } from '@librora/hooks'
+import { createContext } from 'hooks'
 import { ComponentPropsWithoutRef, PropsWithChildren, ReactNode, useState } from 'react'
 
 type ModalProviderProps = {

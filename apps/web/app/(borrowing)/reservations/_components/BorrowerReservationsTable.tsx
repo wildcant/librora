@@ -3,26 +3,28 @@
 import { ReservationStatusBadge } from '@/app/_components/ReservationStatusBadge'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Table } from '@/components/ui/table/Table'
-import { TableStickyCell } from '@/components/ui/table/TableRoot'
-import { Reservation } from '@/lib/types'
+import { TableCellSticky, TableHeadSticky } from '@/components/ui/table/TableRoot'
+import { BorrowerReservation } from '@/lib/types'
 import { ColumnDef } from '@tanstack/react-table'
 import { countries } from 'database/client'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const columns: ColumnDef<Reservation>[] = [
+const columns: ColumnDef<BorrowerReservation>[] = [
   {
     id: 'selectCoverTitle',
     header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+      <TableHeadSticky>
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </TableHeadSticky>
     ),
     cell: ({ row }) => (
-      <TableStickyCell>
+      <TableCellSticky>
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -44,12 +46,12 @@ export const columns: ColumnDef<Reservation>[] = [
             </div>
           </div>
         </Link>
-      </TableStickyCell>
+      </TableCellSticky>
     ),
     enableSorting: false,
     enableHiding: false,
     meta: { stickyLeft: true },
-    size: 400,
+    size: 300,
   },
   {
     accessorKey: 'status',
@@ -81,7 +83,7 @@ export const columns: ColumnDef<Reservation>[] = [
   },
 ]
 
-type BorrowerReservationsTableProps = { reservations: Reservation[]; className?: string }
+type BorrowerReservationsTableProps = { reservations: BorrowerReservation[]; className?: string }
 export function BorrowerReservationsTable({ reservations, className }: BorrowerReservationsTableProps) {
   return (
     <div className={className}>

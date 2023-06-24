@@ -128,7 +128,14 @@ function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
   )
 }
 
-const TableStickyCell = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const TableHeadSticky = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('md:border-r md:py-2 md:px-2 md:shadow-r-md', className)} {...props} />
+  )
+)
+TableHeadSticky.displayName = 'TableHeadSticky'
+
+const TableCellSticky = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
@@ -137,14 +144,16 @@ const TableStickyCell = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
     />
   )
 )
+TableCellSticky.displayName = 'TableCellSticky'
 
 export {
   TableBody,
   TableCaption,
   TableCell,
-  TableStickyCell,
+  TableCellSticky,
   TableFooter,
   TableHead,
+  TableHeadSticky,
   TableHeader,
   TablePagination,
   TableRoot,

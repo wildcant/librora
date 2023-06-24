@@ -6,11 +6,11 @@ export default async function BorrowerReservationDetails({ params }: { params: {
   const user = await getCurrentUser()
   const reservation = await prisma.reservation.findUnique({
     where: { id: params.reservationId },
-    include: { book: { include: { image: true } }, lender: { include: { location: true } } },
+    include: { book: { include: { image: true } } },
   })
 
-  if (!reservation || reservation.borrowerId !== user?.id)
+  if (!reservation || reservation.lenderId !== user?.id)
     return <div>Reservation with id {params.reservationId} not found.</div>
 
-  return <ReservationDetails variant="borrower" {...reservation} />
+  return <ReservationDetails variant="lender" {...reservation} />
 }

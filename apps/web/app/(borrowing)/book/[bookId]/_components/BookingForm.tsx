@@ -7,12 +7,13 @@ import { Form, FormControl, FormField, FormItem } from '@/components/ui/Form'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { Separator } from '@/components/ui/Separator'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { useDeepCompareEffect } from '@/hooks/useDeepCompareEffect'
+import { api } from '@/lib/api/client'
+import { ResponseError } from '@/lib/api/types'
 import { ReservationSchema } from '@/lib/schemas/reservation'
-import { ApiResponse } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Root as Portal } from '@radix-ui/react-portal'
-import { DatabaseTypes } from 'database/client'
 import { Interval } from 'date-fns'
 import differenceInDays from 'date-fns/differenceInDays'
 import format from 'date-fns/format'
@@ -193,11 +194,9 @@ function DesktopBookingForm({ className, reservedIntervals }: DesktopBookingForm
     }
   }
 
-  useEffect(() => {
-    if (defaultValues?.dateRange) {
-      form.setValue('dateRange', defaultValues.dateRange)
-    }
-  }, [defaultValues?.dateRange.to.toString(), defaultValues?.dateRange.from.toString()])
+  useDeepCompareEffect(() => {
+    if (defaultValues?.dateRange) form.setValue('dateRange', defaultValues.dateRange)
+  }, [defaultValues?.dateRange, form])
 
   if (dateRange?.from && dateRange?.to) {
     const { from: start, to: end } = dateRange
@@ -310,35 +309,20 @@ export function BookingForm({ bookId, reservedIntervals }: BookingFormProps) {
   const router = useRouter()
   const form = useForm<BookingSchema>({ resolver: zodResolver(bookingSchema) })
 
-  // TODO: submit booking endpoint and handler.
   const submitBooking = async (data: BookingSchema) => {
     const { from, to } = data.dateRange
     const reservationData: ReservationSchema = {
       bookId: bookId,
       dateRange: { start: from, end: to },
     }
-    const response = await fetch('/api/reservations', {
-      method: 'post',
-      body: JSON.stringify(reservationData),
-    })
-    const apiResponse: ApiResponse<DatabaseTypes.Reservation> = await response.json()
 
-    if ('errors' in apiResponse) {
-      toast({
-        title: apiResponse.errors[0]?.title,
-        description: apiResponse.errors[0]?.detail,
-      })
-      return
+    try {
+      await api.post<ReservationSchema>('/api/reservations', { body: reservationData })
+      router.replace('/reservations')
+    } catch (error) {
+      const errors = error as ResponseError[]
+      errors.map(toast)
     }
-
-    if (!response.ok) {
-      toast({
-        title: 'There was a problem',
-        description: 'Please contact an administrator.',
-      })
-      return
-    }
-    router.replace('/reservations')
   }
 
   return (

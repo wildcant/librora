@@ -31,6 +31,6 @@
     "eslint": "^7.32.0",
     "tsconfig": "workspace:*",
     "typescript": "^4.9.5",
-    "@librora/hooks": "workspace:*"
+    "hooks": "workspace:*"
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
-import { ApiResponse } from '@/lib/types'
+import { ApiResponse } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 import { DatabaseTypes } from 'database/client'
 import { Trash2 } from 'lucide-react'
@@ -38,7 +38,7 @@ const Dropzone = React.forwardRef<HTMLDivElement, DropzoneProps>(
             if ('errors' in apiResponse) {
               toast({
                 title: apiResponse.errors[0]?.title,
-                description: apiResponse.errors[0]?.detail,
+                description: apiResponse.errors[0]?.description,
               })
               return
             }

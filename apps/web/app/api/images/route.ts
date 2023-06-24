@@ -1,5 +1,6 @@
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { cloudinary } from '@/lib/cloudinary'
-import { ApiResponse, ResponseError } from '@/lib/types'
 import { Image, prisma } from 'database/server'
 
 export async function POST(req: Request) {
@@ -7,28 +8,16 @@ export async function POST(req: Request) {
   const imageFile = formData.get('file') as File
 
   if (!imageFile) {
-    const errors: ResponseError = [
-      {
-        title: 'Bad user input',
-        detail: `Missing image file.`,
-      },
-    ]
-
-    return new Response(JSON.stringify({ errors }), { status: 400 })
+    return apiResponse(StatusCode.BAD_REQUEST, { errorMessage: 'Missing image file.' })
   }
 
   const response = await cloudinary.unsigned_upload(imageFile)
 
   if (response instanceof Error) {
     console.error(response)
-    const errors: ResponseError = [
-      {
-        title: 'Server error',
-        detail: `There was a problem saving you're image please contact Admin.`,
-      },
-    ]
-
-    return new Response(JSON.stringify({ errors }), { status: 500 })
+    return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
+      errorMessage: "There was a problem saving you're image please contact Admin.",
+    })
   }
 
   const image = await prisma.image.create({
@@ -38,6 +27,5 @@ export async function POST(req: Request) {
     },
   })
 
-  const res: ApiResponse<Image> = { data: image }
-  return new Response(JSON.stringify(res), { status: 200 })
+  return apiResponse<Image>(StatusCode.OK, { data: image })
 }

@@ -1,6 +1,9 @@
 // import { forgotPasswordSchema } from '@/lib/schemas/forgot-password'
 // import { ApiResponse, SanitizedUser } from '@/lib/types'
 
+import { apiResponse } from '@/lib/api/server'
+import { StatusCode } from '@/lib/api/server/http-status-codes'
+
 // TODO: WIP
 export async function POST(/*req: Request*/) {
   /*
@@ -14,5 +17,5 @@ export async function POST(/*req: Request*/) {
     },
   }
   */
-  return new Response(JSON.stringify({}), { status: 200 })
+  return apiResponse(StatusCode.OK, { data: {} })
 }

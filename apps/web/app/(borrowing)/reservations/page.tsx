@@ -1,12 +1,13 @@
 import { withTabNavigator } from '@/app/_components/withTabNavigator'
 import { prisma } from 'database/server'
-import { BorrowerReservationsTable } from './_components/ReservationsTable'
+import { BorrowerReservationsTable } from './_components/BorrowerReservationsTable'
 import { getCurrentUser } from '@/lib/get-current-user'
 
 async function BorrowerReservations() {
   const user = await getCurrentUser()
   const reservations = await prisma.reservation.findMany({
     where: { borrowerId: user?.id },
+    orderBy: { createdAt: 'desc' },
     include: {
       book: { include: { image: { select: { url: true } } } },
       lender: { include: { location: true } },
