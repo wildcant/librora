@@ -26,8 +26,8 @@ function LenderPendingReservationActions({ onFinish, ...props }: LenderResAction
   const router = useRouter()
   const { toast } = useToast()
 
-  const approveReservation = useMutation<{}, ResponseError[]>({
-    mutationFn: () => api.post(`/api/reservations/${props.id}/approve`),
+  const confirmReservation = useMutation<{}, ResponseError[]>({
+    mutationFn: () => api.post(`/api/reservations/${props.id}/confirm`),
     onError: async (errors) => errors.map(toast),
     onSuccess: () => router.refresh(),
     onSettled: () => onFinish(),
@@ -45,8 +45,8 @@ function LenderPendingReservationActions({ onFinish, ...props }: LenderResAction
       <Button
         variant="ghost"
         className="justify-start pl-4 text-xs"
-        onClick={() => approveReservation.mutate()}
-        loading={approveReservation.isLoading}
+        onClick={() => confirmReservation.mutate()}
+        loading={confirmReservation.isLoading}
         disabled={declineReservation.isLoading}
       >
         Approve
@@ -56,7 +56,7 @@ function LenderPendingReservationActions({ onFinish, ...props }: LenderResAction
         className="justify-start pl-4 text-xs"
         onClick={() => declineReservation.mutate()}
         loading={declineReservation.isLoading}
-        disabled={approveReservation.isLoading}
+        disabled={confirmReservation.isLoading}
       >
         Deny
       </Button>
@@ -162,7 +162,7 @@ type LenderReservationsTableProps = { reservations: LenderReservation[]; classNa
 export function LenderReservationsTable({ reservations, className }: LenderReservationsTableProps) {
   return (
     <div className={className}>
-      <Table data={reservations} columns={columns} className="min-h-[700px]" />
+      <Table data={reservations} columns={columns} />
     </div>
   )
 }

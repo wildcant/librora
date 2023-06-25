@@ -12,10 +12,10 @@ export async function POST(_req: Request, { params }: { params: { reservationId:
   if (!reservation) return apiResponse(StatusCode.NOT_FOUND, { errorMessage: 'Reservation not found.' })
   if (reservation.lenderId !== user.id)
     return apiResponse(StatusCode.UNAUTHORIZED, {
-      errorMessage: 'You have no permission to approve this reservation.',
+      errorMessage: 'You have no permission to confirm this reservation.',
     })
 
-  await prisma.reservation.update({ where: { id: reservation.id }, data: { status: 'APPROVED' } })
+  await prisma.reservation.update({ where: { id: reservation.id }, data: { status: 'CONFIRMED' } })
 
   return apiResponse(StatusCode.OK)
 }

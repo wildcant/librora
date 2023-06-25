@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/Input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { Textarea } from '@/components/ui/TextArea'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { api } from '@/lib/api/client'
+import { ResponseError } from '@/lib/api/types'
 import { BookSchema, bookSchema } from '@/lib/schemas/book'
 import { zodResolver } from '@hookform/resolvers/zod'
 import format from 'date-fns/format'
@@ -26,26 +28,15 @@ export function BookUploadForm() {
 
   const saveBook: SubmitHandler<BookSchema> = async (formData) => {
     setLoading(true)
-    const response = await fetch('/api/books', { method: 'post', body: JSON.stringify(formData) })
-    const apiResponse = await response.json()
-    if ('errors' in apiResponse) {
-      toast({
-        title: apiResponse.errors[0]?.title,
-        description: apiResponse.errors[0]?.detail,
-      })
-      return
+    try {
+      await api.post<BookSchema>('/api/books', { body: formData })
+      router.replace('/lending/books')
+    } catch (error) {
+      const errors = error as ResponseError[]
+      errors.map(toast)
+    } finally {
+      setLoading(false)
     }
-
-    if (!response.ok) {
-      toast({
-        title: 'There was a problem',
-        description: 'Please contact an administrator.',
-      })
-      return
-    }
-
-    router.replace('/lending/books')
-    setLoading(false)
   }
 
   return (

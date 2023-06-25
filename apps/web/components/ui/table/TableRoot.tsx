@@ -83,7 +83,8 @@ interface TablePaginationProps<TData> {
 }
 
 function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
-  return (
+  const showPagination = table.getCanPreviousPage() || table.getCanNextPage()
+  return showPagination ? (
     <div className="flex justify-end">
       <div className="flex items-center space-x-2 h-10 overflow-hidden">
         <Button
@@ -125,6 +126,8 @@ function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
         </Button>
       </div>
     </div>
+  ) : (
+    <></>
   )
 }
 

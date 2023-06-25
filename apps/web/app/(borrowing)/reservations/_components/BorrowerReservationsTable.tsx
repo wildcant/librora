@@ -155,7 +155,7 @@ type BorrowerReservationsTableProps = { reservations: BorrowerReservation[]; cla
 export function BorrowerReservationsTable({ reservations, className }: BorrowerReservationsTableProps) {
   return (
     <div className={className}>
-      <Table data={reservations} columns={columns} className="min-h-[700px]" />
+      <Table data={reservations} columns={columns} />
     </div>
   )
 }

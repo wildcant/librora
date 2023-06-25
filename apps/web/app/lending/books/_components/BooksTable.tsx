@@ -64,7 +64,7 @@ type BooksTableProps = { books: Book[]; className?: string }
 export function BooksTable({ books, className }: BooksTableProps) {
   return (
     <div className={className}>
-      <Table data={books} columns={columns} className="min-h-[700px]" />
+      <Table data={books} columns={columns} />
     </div>
   )
 }

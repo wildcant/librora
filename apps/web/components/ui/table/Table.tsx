@@ -30,11 +30,11 @@ export function Table<TData, TValue>({ columns, data, className }: DataTableProp
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageSize: 7 } },
   })
 
   return (
-    <div className={cn('flex flex-col justify-between', className)}>
+    <div className={cn('flex flex-col justify-between min-h-[590px]', className)}>
       <div className="rounded-md">
         <TableRoot>
           <TableHeader>

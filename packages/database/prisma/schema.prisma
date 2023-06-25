@@ -40,7 +40,7 @@ model User {
   status               Status        @default(PENDING)
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
-  Book                 Book[]
+  books                Book[]
   location             Location?     @relation(fields: [locationId], references: [id])
   locationId           String
   lenderReservations   Reservation[] @relation(name: "lender")

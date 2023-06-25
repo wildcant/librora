@@ -38,7 +38,11 @@ export function ProfileMenu() {
           </Avatar>
         )}
       </PopoverTrigger>
-      <PopoverContent className="w-48 bg-white rounded-2xl shadow-md py-2 border" align="end" sideOffset={10}>
+      <PopoverContent
+        className="w-48 bg-white rounded-2xl shadow-md py-2 border z-50"
+        align="end"
+        sideOffset={10}
+      >
         <div className="flex flex-col">
           {session.status === 'authenticated' ? (
             <>

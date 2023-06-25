@@ -85,25 +85,6 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
 
-  apps/prisma-cloudflare:
-    dependencies:
-      '@neondatabase/serverless':
-        specifier: ^0.4.20
-        version: 0.4.20
-    devDependencies:
-      '@cloudflare/workers-types':
-        specifier: ^4.20230419.0
-        version: 4.20230518.0
-      database:
-        specifier: workspace:*
-        version: link:../../packages/database
-      typescript:
-        specifier: ^4.9.5
-        version: 4.9.5
-      wrangler:
-        specifier: ^3.0.0
-        version: 3.1.1
-
   apps/web:
     dependencies:
       '@hookform/resolvers':

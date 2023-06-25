@@ -18,7 +18,11 @@ export default async function BookDetails({ params }: BookDetailsProps) {
     where: { id: params.bookId },
     include: {
       owner: { select: { firstName: true, lastName: true, location: true, createdAt: true } },
-      reservations: { select: { start: true, end: true } },
+      reservations: {
+        // Get the book calendar blocked intervals.
+        where: { status: { notIn: ['PENDING', 'CANCELED', 'DECLINED', 'EXPIRED'] } },
+        select: { start: true, end: true },
+      },
       image: true,
     },
   })

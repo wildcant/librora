@@ -5,7 +5,7 @@
   "module": "./dist/index.mjs",
   "scripts": {
     "build": "esbuild --minify --bundle --platform=neutral --sourcemap --outdir=dist --out-extension:.js=.mjs ./src/index.ts ",
-    "dev": "miniflare --watch --debug --open",
+    "dev": "miniflare --watch --debug",
     "test": "vitest run",
     "sync": "wrangler deploy ./dist/index.mjs"
   },
