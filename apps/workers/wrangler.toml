@@ -1,0 +1,21 @@
+name = "librora-worker"
+type = "javascript"
+# account_id = ""
+workers_dev = true
+# route = ""
+# zone_id = ""
+compatibility_date = "2023-06-24"
+
+[build]
+command = "pnpm build"
+[build.build]
+format = "service-worker"
+[build.upload]
+format = "modules"
+
+# Cron Triggers Docs: https://developers.cloudflare.com/workers/platform/triggers/cron-triggers
+[triggers]
+crons = ["0 0 12 * * ?"] # Fire at 12pm (noon) every day
+
+[vars]
+DATABASE_URL="postgres://..."

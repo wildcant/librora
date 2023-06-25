@@ -333,9 +333,14 @@ model Location {
 
 enum ReservationStatus {
   PENDING
-  APPROVED
-  DECLINED
   CANCELED
+  DECLINED
+  EXPIRED
+  CONFIRMED
+  BORROWED
+  LATE
+  RETURNED
+  REVIEWED
 }
 
 model Reservation {

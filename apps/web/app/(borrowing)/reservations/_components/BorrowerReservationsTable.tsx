@@ -1,15 +1,78 @@
 'use client'
 
 import { ReservationStatusBadge } from '@/app/_components/ReservationStatusBadge'
+import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
+import { Popover, PopoverTrigger } from '@/components/ui/Popover'
 import { Table } from '@/components/ui/table/Table'
 import { TableCellSticky, TableHeadSticky } from '@/components/ui/table/TableRoot'
+import { useToast } from '@/components/ui/toast/use-toast'
+import { api } from '@/lib/api/client'
+import { ResponseError } from '@/lib/api/types'
 import { BorrowerReservation } from '@/lib/types'
+import { PopoverContent } from '@radix-ui/react-popover'
+import { useMutation } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { countries } from 'database/client'
+import { ReservationStatus, countries } from 'database/client'
 import format from 'date-fns/format'
+import { MoreVertical } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ReactNode, useState } from 'react'
+
+type BorrowerResActionsProps = BorrowerReservation & { onFinish: () => void }
+function BorrowerPendingReservationActions({ onFinish, ...props }: BorrowerResActionsProps) {
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const cancelReservation = useMutation<{}, ResponseError[]>({
+    mutationFn: () => api.post(`/api/reservations/${props.id}/cancel`),
+    onError: async (errors) => errors.map(toast),
+    onSuccess: () => router.refresh(),
+    onSettled: () => onFinish(),
+  })
+
+  console.log(cancelReservation)
+
+  return (
+    <Button
+      variant="ghost"
+      className="justify-start pl-4 text-xs"
+      onClick={() => {
+        console.log('cancel')
+        cancelReservation.mutate()
+      }}
+      loading={cancelReservation.isLoading}
+    >
+      Cancel
+    </Button>
+  )
+}
+
+function BorrowerReservationActions(props: BorrowerReservation) {
+  const [open, setOpen] = useState(false)
+
+  // TODO: Add actions for all reservation states.
+  const actions: { [key in ReservationStatus]?: ReactNode } = {
+    PENDING: <BorrowerPendingReservationActions {...props} onFinish={() => setOpen(false)} />,
+  }
+
+  const action = actions[props.status]
+
+  return action ? (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className="rounded-full h-8 w-8 flex justify-center items-center data-[state=open]:shadow-md">
+        <MoreVertical />
+      </PopoverTrigger>
+      <PopoverContent className="w-48 bg-white rounded-sm shadow-md py-2 border" align="end" sideOffset={10}>
+        <div className="flex flex-col">{actions[props.status]}</div>
+      </PopoverContent>
+    </Popover>
+  ) : (
+    <></>
+  )
+}
 
 const columns: ColumnDef<BorrowerReservation>[] = [
   {
@@ -79,6 +142,11 @@ const columns: ColumnDef<BorrowerReservation>[] = [
     accessorFn: ({ lender: { location } }) =>
       location ? `${location?.city}, ${countries[location.country].country}` : '',
     size: 300,
+    meta: { hiddenMobile: true },
+  },
+  {
+    id: 'action',
+    cell: ({ row }) => <BorrowerReservationActions {...row.original} />,
     meta: { hiddenMobile: true },
   },
 ]
