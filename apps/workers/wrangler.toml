@@ -15,7 +15,7 @@ format = "modules"
 
 # Cron Triggers Docs: https://developers.cloudflare.com/workers/platform/triggers/cron-triggers
 [triggers]
-crons = ["0 0 * * *"] # Fire at 12pm (noon) every day
+crons = ["0 0 * * *"] # Fire at mid night every day
 
 [vars]
 DATABASE_URL="postgres://..."
