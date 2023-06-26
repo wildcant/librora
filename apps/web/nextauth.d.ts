@@ -4,7 +4,7 @@ import { SanitizedUser } from '@/lib/types'
 declare module 'next-auth' {
   interface User extends SanitizedUser {}
   interface Session extends DefaultSession {
-    user?: User
+    user?: SanitizedUser
   }
 }
 

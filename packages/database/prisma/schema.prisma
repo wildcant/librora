@@ -358,6 +358,24 @@ model Reservation {
   updatedAt  DateTime          @updatedAt
 }
 
+enum ReservationEvent {
+  CANCEL
+  EXPIRES
+  DECLINE
+  CONFIRM
+}
+
+enum EventNamespace {
+  RESERVATION
+}
+
+model Event {
+  id        String           @id @default(cuid())
+  namespace EventNamespace
+  name      ReservationEvent
+}
+
+// TODO: Rename to book image.
 model Image {
   id       String  @id @default(cuid())
   publicId String?

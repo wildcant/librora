@@ -31,6 +31,7 @@
     "bcrypt": "^5.1.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "core": "workspace:*",
     "date-fns": "^2.30.0",
     "jose": "^4.11.2",
     "leaflet": "^1.9.4",

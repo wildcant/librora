@@ -24,7 +24,8 @@ export function ProfileMenu() {
       <PopoverTrigger className="rounded-full h-8 w-8 border flex justify-center items-center data-[state=open]:shadow-md">
         {session.status === 'authenticated' ? (
           <Avatar>
-            <AvatarImage src={session.data.user?.image ?? ''} alt="profile-image" />
+            {/* TODO: Add user image to account settings. */}
+            <AvatarImage src={/* session.data.user?.image ?? */ ''} alt="profile-image" />
             <AvatarFallback className="bg-gray-800 text-white">
               {session.data.user?.firstName?.charAt(0)}
               {session.data.user?.lastName?.charAt(0)}

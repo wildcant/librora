@@ -153,6 +153,9 @@ importers:
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
+      core:
+        specifier: workspace:*
+        version: link:../../packages/core
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
@@ -312,6 +315,34 @@ importers:
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
+
+  packages/core:
+    dependencies:
+      '@xstate/fsm':
+        specifier: ^2.1.0
+        version: 2.1.0
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
+    devDependencies:
+      add:
+        specifier: ^2.0.6
+        version: 2.0.6
+      database:
+        specifier: workspace:*
+        version: link:../database
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      tsup:
+        specifier: ^5.11.13
+        version: 5.12.9(typescript@4.9.5)
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+      vitest:
+        specifier: ^0.32.2
+        version: 0.32.2
 
   packages/database:
     dependencies:
@@ -2734,6 +2765,10 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
+  /@xstate/fsm@2.1.0:
+    resolution: {integrity: sha512-oJlc0iD0qZvAM7If/KlyJyqUt7wVI8ocpsnlWzAPl97evguPbd+oJbRM9R4A1vYJffYH96+Bx44nLDE6qS8jQg==}
+    dev: false
+
   /abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
     dev: false
@@ -2773,6 +2808,10 @@ packages:
     resolution: {integrity: sha512-jaVNAFBHNLXspO543WnNNPZFRtavh3skAkITqD0/2aeMkKZTN+254PyhwxFYrk3vQ1xfY+2wbesJMs/JC8/PwQ==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+    dev: true
+
+  /add@2.0.6:
+    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
     dev: true
 
   /agent-base@6.0.2:

@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
       if (token && session.user) {
         session.user.id = token.id
         session.user.type = token.type
-        session.user.email = token.email
+        session.user.email = token.email!
         session.user.emailVerified = token.emailVerified
         session.user.firstName = token.firstName
         session.user.lastName = token.lastName
