@@ -7,8 +7,9 @@ import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import { SignJWT, decodeJwt } from 'jose'
 import omit from 'lodash/omit'
+import { NextRequest } from 'next/server'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { email, password } = loginSchema.parse(await req.json())
   const rawUser = await prisma.user.findUnique({ where: { email }, include: { location: true } })
   const passwordMatched = await bcrypt.compare(password, rawUser?.password ?? '')

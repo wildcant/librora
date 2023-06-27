@@ -16,18 +16,18 @@ export const borrower: DatabaseTypes.User = {
 }
 
 export const owner: DatabaseTypes.User = {
-  id: 'cljbn2vez000fvkx180der79y',
-  email: 'forest@yahoo.com',
+  id: 'cljbn2s6c0000vkx1nvlyv5sv',
+  email: 'joe@mail.com',
   emailVerified: null,
-  firstName: 'Forest',
-  lastName: 'Jast',
-  password: '$2b$10$E3VczWt0JypBGWz606dHpep6/IVzZNTErqIPPRJHezmYsKzZtgEye',
+  firstName: 'Joe',
+  lastName: 'Doe',
+  password: '$2b$10$zrknyzWekMfjAQc60PD8F.quH/wYHpXO0ePtfCy9t4oiYShZgx4vK',
   type: 'USER',
   role: 'LENDER_BORROWER_USER',
   status: 'ACTIVE',
-  createdAt: new Date('2023-06-25T16:23:23.532Z'),
-  updatedAt: new Date('2023-06-26T02:22:30.906Z'),
-  locationId: 'cljbn2vez000hvkx19ilzibsl',
+  createdAt: new Date('2023-06-25T16:23:19.333Z'),
+  updatedAt: new Date('2023-06-25T16:23:19.333Z'),
+  locationId: 'cljbn2s6d0001vkx1uibbotq3',
 }
 
 export const book: DatabaseTypes.Book = {

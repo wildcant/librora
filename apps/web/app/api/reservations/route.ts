@@ -1,16 +1,30 @@
-import { BodyParserHandler, parseBody, validateUser } from '@/app/api/middlewares'
+import {
+  BodyParserExtension,
+  Callback,
+  ExtendedRequest,
+  UserValidationExtension,
+  parseBody,
+  route,
+  validateUser,
+} from '@/app/api/middlewares'
 import { apiResponse } from '@/lib/api/server'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
-import { reservationSchema, ReservationSchema } from '@/lib/schemas/reservation'
+import { ReservationSchema, reservationSchema } from '@/lib/schemas/reservation'
 import { reservationMachine } from 'core'
 import { prisma } from 'database/server'
 import merge from 'lodash/merge'
 import pick from 'lodash/pick'
+import { NextRequest } from 'next/server'
 
-const createNewReservation: BodyParserHandler<ReservationSchema> = async (_req, { user, data }) => {
+const createReservation: Callback<
+  ExtendedRequest<UserValidationExtension & BodyParserExtension<ReservationSchema>>
+> = async (req) => {
+  const { data, user } = req
   const book = await prisma.book.findUnique({ where: { id: data.bookId } })
   if (!book) {
-    return apiResponse(StatusCode.NOT_FOUND, { errorMessage: `Book with id ${data.bookId} was not found.` })
+    return apiResponse(StatusCode.NOT_FOUND, {
+      errorMessage: `Book with id ${data.bookId} was not found.`,
+    })
   }
 
   const reservedIntervals = await prisma.reservation.findMany({
@@ -63,4 +77,5 @@ const createNewReservation: BodyParserHandler<ReservationSchema> = async (_req, 
   return apiResponse(StatusCode.OK)
 }
 
-export const POST = validateUser(parseBody(createNewReservation, reservationSchema))
+export const POST = (rawRequest: NextRequest) =>
+  route(rawRequest).use(validateUser).use(parseBody(reservationSchema)).use(createReservation).exec()

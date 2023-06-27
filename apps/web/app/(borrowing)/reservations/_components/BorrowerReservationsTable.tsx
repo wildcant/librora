@@ -33,14 +33,11 @@ function BorrowerPendingReservationActions({ onFinish, ...props }: BorrowerResAc
     onSettled: () => onFinish(),
   })
 
-  console.log(cancelReservation)
-
   return (
     <Button
       variant="ghost"
       className="justify-start pl-4 text-xs"
       onClick={() => {
-        console.log('cancel')
         cancelReservation.mutate()
       }}
       loading={cancelReservation.isLoading}

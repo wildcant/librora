@@ -55,3 +55,7 @@ Possible transitions: None. The reservation remains in the reviewed state.
 ### Issues
 
 Check https://github.com/microsoft/TypeScript/issues/47663#issuecomment-1519138189, currently having the issue in hooks after importing lodash.
+
+### References
+
+- [ ] Airbnb https://www.youtube.com/watch?v=acJLSr_JB1c

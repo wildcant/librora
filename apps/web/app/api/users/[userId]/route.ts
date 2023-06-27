@@ -5,8 +5,9 @@ import { SanitizedUser } from '@/lib/types'
 import bcrypt from 'bcrypt'
 import { prisma } from 'database/server'
 import omit from 'lodash/omit'
+import { NextRequest } from 'next/server'
 
-export async function PATCH(req: Request, { params }: { params: { userId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { userId: string } }) {
   const user = await prisma.user.findUnique({ where: { id: params.userId } })
   if (!user)
     return apiResponse(StatusCode.NOT_FOUND, { errorMessage: `User with id ${params.userId} was not found.` })

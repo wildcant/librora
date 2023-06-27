@@ -2,8 +2,9 @@ import { apiResponse } from '@/lib/api/server'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { cloudinary } from '@/lib/cloudinary'
 import { Image, prisma } from 'database/server'
+import { NextRequest } from 'next/server'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const imageFile = formData.get('file') as File
 

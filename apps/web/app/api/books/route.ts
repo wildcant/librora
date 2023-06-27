@@ -3,9 +3,10 @@ import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { getCurrentUser } from '@/lib/get-current-user'
 import { BookSchema, bookSchema } from '@/lib/schemas/book'
 import { Book, prisma } from 'database/server'
+import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) {
     return apiResponse(StatusCode.UNAUTHORIZED, { errorMessage: 'Please login in order to upload a book.' })

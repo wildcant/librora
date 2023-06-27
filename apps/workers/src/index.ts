@@ -8,7 +8,6 @@ export interface Env {
 export default {
   // Ideally I would use Durable Object Alerts to handle 24 hours expired reservations but that feature is not free to use :(
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    console.log('scheduled')
     const client = new Client(env.DATABASE_URL)
     await client.connect()
     // TODO: We could create a new event table to store this mutation.
@@ -16,6 +15,6 @@ export default {
       `UPDATE "Reservation" SET status = 'EXPIRED' WHERE status='PENDING' AND start + interval '24 hours' > NOW();`
     )
     ctx.waitUntil(client.end())
-    console.log(`Expired reservations trigger fired at ${event.cron}, reservations updated ${rowCount}`)
+    console.info(`Expired reservations trigger fired at ${event.cron}, reservations updated ${rowCount}`)
   },
 }

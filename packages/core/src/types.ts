@@ -1,7 +1,5 @@
 import type { DatabaseTypes } from 'database/client'
 
-export type ReservationEvent = ({ type: 'BOOK' } & BookingArgs) | { type: DatabaseTypes.ReservationEvent }
-
 export interface ReservationContext {
   // borrower: DatabaseTypes.User
   // reservation?: DatabaseTypes.Reservation
@@ -18,6 +16,23 @@ export type BookingArgs = {
     }[]
   }
 }
+
+export type CancelArgs = {
+  requester: Pick<DatabaseTypes.User, 'id'>
+  reservation: Pick<DatabaseTypes.Reservation, 'start' | 'borrowerId'>
+}
+
+export type DeclineArgs = {
+  requester: Pick<DatabaseTypes.User, 'id'>
+  reservation: Pick<DatabaseTypes.Reservation, 'lenderId'>
+}
+
+export type ReservationEvent =
+  | ({ type: 'BOOK' } & BookingArgs)
+  | ({ type: Extract<DatabaseTypes.ReservationEvent, 'CANCEL'> } & CancelArgs)
+  | { type: Extract<DatabaseTypes.ReservationEvent, 'EXPIRES'> }
+  | ({ type: Extract<DatabaseTypes.ReservationEvent, 'DECLINE'> } & DeclineArgs)
+  | { type: Extract<DatabaseTypes.ReservationEvent, 'CONFIRM'> }
 
 export type ReservationState =
   | {

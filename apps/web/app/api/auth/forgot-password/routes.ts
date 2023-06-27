@@ -5,7 +5,7 @@ import { apiResponse } from '@/lib/api/server'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
 
 // TODO: WIP
-export async function POST(/*req: Request*/) {
+export async function POST(/*req: NextRequest*/) {
   /*
   const { email } = forgotPasswordSchema.parse(await req.json())
   const rawUser = await prisma.user.findUnique({ where: { email }, select: { id: true, firstName: true } })
