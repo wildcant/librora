@@ -45,7 +45,7 @@ export function BookUploadForm() {
         <form onSubmit={form.handleSubmit(saveBook)} className="flex flex-col gap-4" noValidate>
           <FormField
             control={form.control}
-            name="image"
+            name="imageId"
             render={({ field, fieldState }) => (
               <div>
                 <h3 className="text-sm font-bold">Add a photo of your book</h3>

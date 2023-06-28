@@ -3,12 +3,14 @@ import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { cloudinary } from '@/lib/cloudinary'
 import { prisma } from 'database/server'
 import { NextRequest } from 'next/server'
+import { Callback, ExtendedRequest, UserValidationExtension, route, validateUser } from '../../middlewares'
 
-export async function DELETE(_req: NextRequest, { params }: { params: { imageId: string } }) {
-  const image = await prisma.image.findUnique({ where: { id: params.imageId } })
+type DeleteBook = Callback<ExtendedRequest<UserValidationExtension>, { params: { imageId: string } }>
+const deleteBook: DeleteBook = async (_req, options) => {
+  const image = await prisma.image.findUnique({ where: { id: options.params.imageId } })
   if (!image) {
-    return apiResponse(StatusCode.BAD_REQUEST, {
-      errors: [{ title: 'Bad user input', description: `Image with id ${params.imageId} doesn't exist.` }],
+    return apiResponse(StatusCode.NOT_FOUND, {
+      errorMessage: `Image with id ${options.params.imageId} was not found.`,
     })
   }
 
@@ -20,3 +22,5 @@ export async function DELETE(_req: NextRequest, { params }: { params: { imageId:
 
   return apiResponse(StatusCode.OK)
 }
+
+export const DELETE = (request: NextRequest) => route(request).use(validateUser).use(deleteBook).exec()

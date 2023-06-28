@@ -2,7 +2,7 @@ import areIntervalsOverlapping from 'date-fns/areIntervalsOverlapping'
 import differenceInHours from 'date-fns/differenceInHours'
 import isAfter from 'date-fns/isAfter'
 import subHours from 'date-fns/subHours'
-import { assign, createMachine } from 'xstate'
+import { assign, createMachine, StateFrom } from 'xstate'
 import { ReservationContext, ReservationEvent } from './types'
 
 export const reservationMachine = createMachine(
@@ -98,3 +98,5 @@ export const reservationMachine = createMachine(
     },
   }
 )
+
+export type ReservationMachineState = StateFrom<typeof reservationMachine>

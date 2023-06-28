@@ -2,28 +2,35 @@ import { apiResponse } from '@/lib/api/server'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { getCurrentUser } from '@/lib/get-current-user'
 import { SanitizedUser } from '@/lib/types'
-import merge from 'lodash/merge'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
-export type Callback<TNextRequest = NextRequest, TNextRequestNext = NextRequest> = (
-  req: TNextRequest,
-  options: any,
-  next?: Middleware<TNextRequestNext>
-) => void
+export type Callback<
+  TNextRequest = NextRequest,
+  TOptions extends { params: Record<string, any> } | null = null,
+  TNextRequestNext = NextRequest
+> = (req: TNextRequest, options: TOptions, next?: Middleware<TNextRequestNext, TOptions>) => void
 
 // We should differentiate between current handle req and next handle req, since the middleware might change said object.
-interface Middleware<TNextRequest = NextRequest, TNextRequestNext = NextRequest> {
+interface Middleware<
+  TNextRequest = NextRequest,
+  TOptions extends { params: Record<string, any> } | null = null,
+  TNextRequestNext = NextRequest
+> {
   originalNextRequest: TNextRequest
-  handle: Callback<TNextRequest, TNextRequestNext>
-  next: Middleware<TNextRequestNext> | undefined
-  setNext: (middleware: Middleware<TNextRequestNext>) => Middleware<TNextRequestNext>
+  handle: Callback<TNextRequest, TOptions, TNextRequestNext>
+  next: Middleware<TNextRequestNext, TOptions> | undefined
+  setNext: (middleware: Middleware<TNextRequestNext, TOptions>) => Middleware<TNextRequestNext, TOptions>
 }
 
-const middleware = <TNextRequest = NextRequest, TNextRequestNext = NextRequest>(
+const middleware = <
+  TNextRequest = NextRequest,
+  TOptions extends { params: Record<string, any> } | null = null,
+  TNextRequestNext = NextRequest
+>(
   originalNextRequest: TNextRequest,
-  callback: Callback<TNextRequest, TNextRequestNext>
-): Middleware<TNextRequest, TNextRequestNext> => ({
+  callback: Callback<TNextRequest, TOptions, TNextRequestNext>
+): Middleware<TNextRequest, TOptions, TNextRequestNext> => ({
   originalNextRequest,
   handle(req, options) {
     let newRequest = req
@@ -41,19 +48,21 @@ const middleware = <TNextRequest = NextRequest, TNextRequestNext = NextRequest>(
 })
 
 /** Route implementation. */
-export const route = (req: NextRequest, options?: any) => ({
+export const route = (req: NextRequest, options: any = {}) => ({
   handler: undefined as any | undefined,
   chain: undefined as any | undefined,
   req,
   options,
-  use<TNextRequest = NextRequest, TNextRequestNext = NextRequest>(
-    callback: Callback<TNextRequest, TNextRequestNext>
-  ) {
+  use<
+    TNextRequest = NextRequest,
+    TOptions extends { params: Record<string, any> } | null = null,
+    TNextRequestNext = NextRequest
+  >(callback: Callback<TNextRequest, TOptions, TNextRequestNext>) {
     if (!this.handler || !this.chain) {
-      this.handler = middleware<TNextRequest, TNextRequestNext>(
+      this.handler = middleware<TNextRequest, TOptions, TNextRequestNext>(
         req as TNextRequest,
         callback
-      ) as unknown as Middleware<TNextRequest, TNextRequestNext>
+      ) as unknown as Middleware<TNextRequest, TOptions, TNextRequestNext>
       this.chain = this.handler
     } else {
       this.chain = this.chain?.setNext(middleware(req as TNextRequest, callback))
@@ -67,15 +76,14 @@ export const route = (req: NextRequest, options?: any) => ({
 
 export type UserValidationExtension = { user: SanitizedUser }
 /** Validate user is authenticated. */
-export const validateUser: Callback<NextRequest, NextRequest & UserValidationExtension> = async (
+export const validateUser: Callback<NextRequest, null, NextRequest & UserValidationExtension> = async (
   req,
   options,
   next
 ) => {
   const user = await getCurrentUser()
   if (!user) return apiResponse(StatusCode.UNAUTHORIZED, { errorMessage: 'Please login.' })
-
-  return next?.handle(merge(req, { user }), options)
+  return next?.handle(Object.assign(req, { user }), options)
 }
 
 export type BodyParserExtension<T> = { data: T }
@@ -83,11 +91,11 @@ export type BodyParserExtension<T> = { data: T }
 export const parseBody =
   <TBodyShape extends z.ZodRawShape>(
     schema: z.ZodObject<TBodyShape>
-  ): Callback<NextRequest, NextRequest & BodyParserExtension<TBodyShape>> =>
+  ): Callback<NextRequest, null, NextRequest & BodyParserExtension<TBodyShape>> =>
   async (req, options, next) => {
     try {
       const data = schema.parse(await req.json()) as unknown as TBodyShape
-      return next?.handle(merge(req, { data }), options)
+      return next?.handle(Object.assign(req, { data }), options)
     } catch (error) {
       if (error instanceof z.ZodError) {
         return apiResponse(StatusCode.BAD_REQUEST, {

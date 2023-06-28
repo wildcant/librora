@@ -1,42 +1,56 @@
-import { apiResponse } from '@/lib/api/server'
+import {
+  Callback,
+  ExtendedRequest,
+  UserValidationExtension,
+  route,
+  validateUser,
+} from '@/app/api/middlewares'
+import { ErrorOptions, apiResponse } from '@/lib/api/server'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
-import { getCurrentUser } from '@/lib/get-current-user'
-import { reservationMachine } from 'core'
-import { prisma } from 'database/server'
+import { ReservationMachineState, reservationMachine } from 'core'
+
+import { ReservationStatus, prisma } from 'database/server'
 import pick from 'lodash/pick'
 import { NextRequest } from 'next/server'
 
-export async function POST(_req: NextRequest, { params }: { params: { reservationId: string } }) {
-  const user = await getCurrentUser()
-  if (!user) return apiResponse(StatusCode.UNAUTHORIZED, { errorMessage: 'Please login.' })
+function handleTransitionResponse(newState: ReservationMachineState): [error: ErrorOptions, newState: 'ERROR']
+function handleTransitionResponse(
+  newState: ReservationMachineState
+): [error: undefined, newState: ReservationStatus]
+function handleTransitionResponse(
+  newState: ReservationMachineState
+): [error: ErrorOptions | undefined, newState: ReservationStatus | 'ERROR'] {
+  if (newState.value === 'ERROR') {
+    if (newState.context?.error) {
+      return [{ errors: [{ title: 'Invalid user input', description: newState.context.error }] }, 'ERROR']
+    } else {
+      return [{ errorMessage: "There was a problem processing you're request." }, 'ERROR']
+    }
+  } else {
+    return [undefined, newState.value as ReservationStatus]
+  }
+}
 
+type CancelReservation = Callback<
+  ExtendedRequest<UserValidationExtension>,
+  { params: { reservationId: string } }
+>
+const cancelReservation: CancelReservation = async (request, { params }) => {
   const reservation = await prisma.reservation.findUnique({ where: { id: params.reservationId } })
-
   if (!reservation) return apiResponse(StatusCode.NOT_FOUND, { errorMessage: 'Reservation not found.' })
-  if (reservation.borrowerId !== user.id)
-    return apiResponse(StatusCode.UNAUTHORIZED, {
-      errorMessage: 'You have no permission to cancel this reservation.',
-    })
 
-  const newState = reservationMachine.transition(reservation.status, {
+  const transitionResponse = reservationMachine.transition(reservation.status, {
     type: 'CANCEL',
-    requester: pick(user, 'id'),
+    requester: pick(request.user, 'id'),
     reservation: pick(reservation, ['borrowerId', 'start']),
   })
 
-  if (newState.value === 'ERROR') {
-    if (newState.context?.error) {
-      return apiResponse(StatusCode.BAD_REQUEST, {
-        errors: [{ title: 'Invalid user input', description: newState.context.error }],
-      })
-    } else {
-      return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
-        errorMessage: "There was a problem processing you're request.",
-      })
-    }
-  }
+  const [error, mewState] = handleTransitionResponse(transitionResponse)
+  if (error) return apiResponse(StatusCode.BAD_REQUEST, error)
 
   await prisma.reservation.update({ where: { id: reservation.id }, data: { status: 'CANCELED' } })
 
   return apiResponse(StatusCode.OK)
 }
+
+export const POST = (request: NextRequest) => route(request).use(validateUser).use(cancelReservation).exec()

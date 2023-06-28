@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const bookSchema = z.object({
-  image: z.string({ required_error: 'Image is required.' }),
+  imageId: z.string({ required_error: 'Image is required.' }),
   title: z.string({ required_error: 'Title is required.' }),
   description: z.string({ required_error: 'Description is required.' }),
   date: z.coerce.date({ required_error: 'Date is required.' }),

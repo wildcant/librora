@@ -6,7 +6,7 @@ import { ResponseError } from '../types'
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never }
 type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U
 
-type ErrorOptions = XOR<{ errors: ResponseError[] }, { errorMessage: string }>
+export type ErrorOptions = XOR<{ errors: ResponseError[] }, { errorMessage: string }>
 type DataOptions<T, TMeta = { [key: string]: string }> = { data: T; meta?: TMeta }
 
 export function apiResponse<T, TMeta = { [key: string]: string }>(

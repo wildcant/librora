@@ -3,8 +3,10 @@ import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { cloudinary } from '@/lib/cloudinary'
 import { Image, prisma } from 'database/server'
 import { NextRequest } from 'next/server'
+import { Callback, ExtendedRequest, UserValidationExtension, route, validateUser } from '../middlewares'
 
-export async function POST(req: NextRequest) {
+type AddImage = Callback<ExtendedRequest<UserValidationExtension>, { params: { imageId: string } }>
+const addImage: AddImage = async (req: NextRequest) => {
   const formData = await req.formData()
   const imageFile = formData.get('file') as File
 
@@ -30,3 +32,5 @@ export async function POST(req: NextRequest) {
 
   return apiResponse<Image>(StatusCode.OK, { data: image })
 }
+
+export const POST = (request: NextRequest) => route(request).use(validateUser).use(addImage).exec()

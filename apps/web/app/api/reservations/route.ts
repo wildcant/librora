@@ -20,7 +20,7 @@ const createReservation: Callback<
   ExtendedRequest<UserValidationExtension & BodyParserExtension<ReservationSchema>>
 > = async (req) => {
   const { data, user } = req
-  const book = await prisma.book.findUnique({ where: { id: data.bookId } })
+  const book = await prisma.book.findUnique({ where: { id: data.bookId }, select: { userId: true } })
   if (!book) {
     return apiResponse(StatusCode.NOT_FOUND, {
       errorMessage: `Book with id ${data.bookId} was not found.`,
