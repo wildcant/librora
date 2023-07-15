@@ -12,6 +12,7 @@ async function LenderReservations() {
       book: { include: { image: { select: { url: true } } } },
     },
   })
+
   return (
     <div className="container py-2">
       <div className="flex justify-between items-center">

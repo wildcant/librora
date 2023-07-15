@@ -51,7 +51,13 @@ async function BookList({ params, className }: BookListProps) {
   // TODO: Use postgres text search.
   const query = { where: { title: { contains: search } } }
   const [books, count] = await Promise.all([
-    prisma.book.findMany({ ...query, include: { image: true }, take: BOOK_LIST_PAGE_SIZE, skip }),
+    prisma.book.findMany({
+      ...query,
+      include: { image: true },
+      take: BOOK_LIST_PAGE_SIZE,
+      skip,
+      orderBy: { title: 'desc' },
+    }),
     prisma.book.count(query),
   ])
   const hasNextPage = skip + BOOK_LIST_PAGE_SIZE < count

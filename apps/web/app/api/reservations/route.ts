@@ -8,6 +8,7 @@ import {
   validateUser,
 } from '@/app/api/middlewares'
 import { apiResponse } from '@/lib/api/server'
+import { handleReservationTransitionResponse } from '@/lib/api/server/handle-reservation-transition'
 import { StatusCode } from '@/lib/api/server/http-status-codes'
 import { ReservationSchema, reservationSchema } from '@/lib/schemas/reservation'
 import { reservationMachine } from 'core'
@@ -20,7 +21,10 @@ const createReservation: Callback<
   ExtendedRequest<UserValidationExtension & BodyParserExtension<ReservationSchema>>
 > = async (req) => {
   const { data, user } = req
-  const book = await prisma.book.findUnique({ where: { id: data.bookId }, select: { userId: true } })
+  const book = await prisma.book.findUnique({
+    where: { id: data.bookId },
+    select: { id: true, userId: true },
+  })
   if (!book) {
     return apiResponse(StatusCode.NOT_FOUND, {
       errorMessage: `Book with id ${data.bookId} was not found.`,
@@ -32,24 +36,15 @@ const createReservation: Callback<
     select: { start: true, end: true },
   })
 
-  const newState = reservationMachine.transition('IDLE', {
+  const transitionResponse = reservationMachine.transition('IDLE', {
     type: 'BOOK',
     borrower: pick(user, 'id'),
     dateRange: data.dateRange,
-    book: merge(pick(book, ['userId']), { reservedIntervals }),
+    book: merge(pick(book, ['id', 'userId']), { reservedIntervals }),
   })
 
-  if (newState.value === 'ERROR') {
-    if (newState.context?.error) {
-      return apiResponse(StatusCode.BAD_REQUEST, {
-        errors: [{ title: 'Invalid user input', description: newState.context.error }],
-      })
-    } else {
-      return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
-        errorMessage: "There was a problem processing you're request.",
-      })
-    }
-  }
+  const [error] = handleReservationTransitionResponse(transitionResponse)
+  if (error) return apiResponse(StatusCode.BAD_REQUEST, error)
 
   const response = await prisma.book
     .update({
@@ -73,6 +68,18 @@ const createReservation: Callback<
       errorMessage: "There was a problem processing you're request.",
     })
   }
+
+  // const { actions, event, context, meta } = transitionResponse
+  // const response = await Promise.all(actions.map((action) => action.exec?.(context, event, meta))).catch(
+  //   (err) => new Error(err)
+  // )
+
+  // if (response && response instanceof Error) {
+  //   console.error(response)
+  //   return apiResponse(StatusCode.INTERNAL_SERVER_ERROR, {
+  //     errorMessage: "There was a problem processing you're request.",
+  //   })
+  // }
 
   return apiResponse(StatusCode.OK)
 }

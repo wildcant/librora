@@ -29,19 +29,21 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "dotenv -e ../../.env tsup",
     "clean": "rimraf .turbo node_modules dist",
-    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:deploy": "dotenv -e ../../.env prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
-    "db:push": "prisma db push --force-reset",
-    "db:seed": "tsx src/server/seed.ts",
-    "dev": "tsup --watch",
+    "db:push": "dotenv -e ../../.env prisma db push --force-reset",
+    "db:push:test": "dotenv -e ../../.env.test prisma db push --force-reset",
+    "db:seed": "dotenv -e ../../.env tsx src/server/seed.ts",
+    "dev": "dotenv -e ../../.env tsup --watch",
+    "dev:test": "dotenv -e ../../.env.test tsup --watch",
     "format": "prisma format",
     "generate": "prisma generate",
     "lint": "eslint \"src/**/*.ts\"",
     "prebuild": "npm run generate",
     "predev": "npm run generate",
-    "studio": "prisma studio"
+    "studio": "dotenv -e ../../.env.test prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^4.15.0",

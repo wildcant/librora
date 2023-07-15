@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup",
+    "dev": "tsup --watch",
     "test": "vitest",
     "postinstall": "xstate typegen \"./src/**/*.ts?(x)\""
   },

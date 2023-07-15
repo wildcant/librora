@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  pg-test:
+    image: postgres:14.1-alpine
+    container_name: librora-postgres-e2e-tests
+    restart: always
+    ports:
+      - '5436:5432'
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: librora-tests

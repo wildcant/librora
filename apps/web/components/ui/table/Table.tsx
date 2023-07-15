@@ -12,25 +12,42 @@ import {
 import { cn } from '@/lib/utils'
 import {
   ColumnDef,
+  // OnChangeFn,
+  // RowSelectionState,
+  // RowSelectionTableState,
+  // TableOptions,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  className?: string
-}
+type DataTableProps<TData, TValue> =
+  // Pick<TableOptions<TData>, 'onRowSelectionChange'> &
+  // RowSelectionTableState &
+  {
+    columns: ColumnDef<TData, TValue>[]
+    data: TData[]
+    className?: string
+    // onRowSelectionChange: OnChangeFn<RowSelectionState>
+  }
 
-export function Table<TData, TValue>({ columns, data, className }: DataTableProps<TData, TValue>) {
+export function Table<TData, TValue>({
+  columns,
+  data,
+  // rowSelection,
+  // onRowSelectionChange,
+  className,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 7 } },
+    // state: { rowSelection },
+    // enableRowSelection: true,
+    // onRowSelectionChange,
   })
 
   return (

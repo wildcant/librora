@@ -2,12 +2,13 @@
 
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Table } from '@/components/ui/table/Table'
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef /* , RowSelectionState */ } from '@tanstack/react-table'
 import { Book } from '@/lib/types'
 import format from 'date-fns/format'
 import Image from 'next/image'
 import Link from 'next/link'
 import { TableCellSticky } from '@/components/ui/table/TableRoot'
+// import { useState } from 'react'
 
 export const columns: ColumnDef<Book>[] = [
   {
@@ -34,7 +35,7 @@ export const columns: ColumnDef<Book>[] = [
                 alt="book"
                 width={640}
                 height={480}
-                className="object-cover rounded-md h-10 "
+                className="object-cover rounded-md h-10"
               />
             </div>
             <div className="w-5/6 md:max-w-xs">
@@ -62,9 +63,15 @@ export const columns: ColumnDef<Book>[] = [
 
 type BooksTableProps = { books: Book[]; className?: string }
 export function BooksTable({ books, className }: BooksTableProps) {
+  // const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   return (
     <div className={className}>
-      <Table data={books} columns={columns} />
+      <Table
+        data={books}
+        columns={columns}
+        // rowSelection={rowSelection}
+        // onRowSelectionChange={(d) => {}}
+      />
     </div>
   )
 }

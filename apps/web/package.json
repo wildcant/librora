@@ -4,8 +4,10 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
+    "dev:test": "dotenv -e ./.env.test -- next dev -p 3010",
     "build": "next build",
     "start": "next start",
+    "start:test": "next start -p 3010",
     "lint": "next lint"
   },
   "dependencies": {
@@ -62,6 +64,7 @@
     "autoprefixer": "^10.4.14",
     "config": "workspace:*",
     "database": "workspace:*",
+    "dotenv": "^16.3.1",
     "eslint": "^7.32.0",
     "hooks": "workspace:*",
     "postcss": "^8.4.24",

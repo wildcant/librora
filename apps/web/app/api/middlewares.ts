@@ -5,6 +5,8 @@ import { SanitizedUser } from '@/lib/types'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
+export type Options = any
+
 export type Callback<
   TNextRequest = NextRequest,
   TOptions extends { params: Record<string, any> } | null = null,
@@ -17,7 +19,7 @@ interface Middleware<
   TOptions extends { params: Record<string, any> } | null = null,
   TNextRequestNext = NextRequest
 > {
-  originalNextRequest: TNextRequest
+  originalRequest: TNextRequest
   handle: Callback<TNextRequest, TOptions, TNextRequestNext>
   next: Middleware<TNextRequestNext, TOptions> | undefined
   setNext: (middleware: Middleware<TNextRequestNext, TOptions>) => Middleware<TNextRequestNext, TOptions>
@@ -28,15 +30,15 @@ const middleware = <
   TOptions extends { params: Record<string, any> } | null = null,
   TNextRequestNext = NextRequest
 >(
-  originalNextRequest: TNextRequest,
+  originalRequest: TNextRequest,
   callback: Callback<TNextRequest, TOptions, TNextRequestNext>
 ): Middleware<TNextRequest, TOptions, TNextRequestNext> => ({
-  originalNextRequest,
+  originalRequest,
   handle(req, options) {
     let newRequest = req
     // Restore key properties after a middleware runs.
-    if (this.originalNextRequest instanceof Request && req instanceof Request) {
-      newRequest = Object.assign(req, { json: this.originalNextRequest.json })
+    if (this.originalRequest instanceof Request && req instanceof Request) {
+      newRequest = Object.assign(req, { json: this.originalRequest.json })
     }
     return callback(newRequest, options, this.next)
   },

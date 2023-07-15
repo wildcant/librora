@@ -9,7 +9,7 @@ export interface ReservationContext {
 export type BookingArgs = {
   dateRange: { end: Date; start: Date }
   borrower: Pick<DatabaseTypes.User, 'id'>
-  book: Pick<DatabaseTypes.Book, 'userId'> & {
+  book: Pick<DatabaseTypes.Book, 'id' | 'userId'> & {
     reservedIntervals: {
       end: Date
       start: Date

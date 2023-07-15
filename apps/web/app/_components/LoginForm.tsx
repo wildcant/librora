@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form'
 import { useForgotPasswordModal } from './modals/forgot-password'
 import { useLoginModal } from './modals/login'
 import { useSignUpModal } from './modals/sign-up'
+import { useToast } from '@/components/ui/toast/use-toast'
 
 type LoginFormProps = { isModal?: boolean }
 
@@ -22,14 +23,15 @@ export function LoginForm({ isModal }: LoginFormProps) {
   const loginModal = useLoginModal()
   const forgotPasswordModal = useForgotPasswordModal()
   const { status } = useSession()
+  const { toast } = useToast()
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     /* Dev only. */
-    defaultValues: {
-      email: 'joe@mail.com',
-      password: '12345',
-    },
+    // defaultValues: {
+    //   email: 'joe@mail.com',
+    //   password: '12345',
+    // },
     /* */
   })
 
@@ -40,8 +42,12 @@ export function LoginForm({ isModal }: LoginFormProps) {
         password: values.password,
         redirect: false,
       })
+
       if (response?.error) {
-        // TODO: Handle error.
+        toast({
+          title: `There was a problem login in`,
+          description: response.error,
+        })
         return
       }
 

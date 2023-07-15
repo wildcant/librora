@@ -21,7 +21,10 @@ export function ProfileMenu() {
 
   return (
     <Popover>
-      <PopoverTrigger className="rounded-full h-8 w-8 border flex justify-center items-center data-[state=open]:shadow-md">
+      <PopoverTrigger
+        className="rounded-full h-8 w-8 border flex justify-center items-center data-[state=open]:shadow-md"
+        aria-label="avatar-dialog-trigger"
+      >
         {session.status === 'authenticated' ? (
           <Avatar>
             {/* TODO: Add user image to account settings. */}

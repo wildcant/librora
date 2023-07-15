@@ -8,11 +8,22 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "db:migrate:deploy": {},
-    "db:push": {},
+    "db:push": {
+      "cache": false
+    },
+    "db:push:test": {
+      "cache": false
+    },
     "db:seed": {},
+    "start:test": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:test": {
+      "cache": false
     },
     "generate": {
       "dependsOn": ["^generate"]

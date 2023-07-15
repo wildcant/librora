@@ -373,12 +373,16 @@ model Event {
   id        String           @id @default(cuid())
   namespace EventNamespace
   name      ReservationEvent
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }
 
 // TODO: Rename to book image.
 model Image {
-  id       String  @id @default(cuid())
-  publicId String?
-  url      String
-  Book     Book[]
+  id        String   @id @default(cuid())
+  publicId  String?
+  url       String
+  Book      Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
