@@ -1,27 +1,56 @@
-name: Playwright Tests
+name: End to End Tests
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
+
+env:
+  DATABASE_URL: postgres://postgres:12345@127.0.0.1:5436/librora-tests
+  WEB_URL: http://localhost:3010
+  JWT_EXPIRATION: 24h
+  JWT_SECRET: secret
+  NEXTAUTH_SECRET: secret
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
 jobs:
-  test:
+  test-e2e:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - name: 🏗 Setup docker compose
+        uses: ./.github/actions/docker-compose
+
+      - name: 🏗 Start database containers
+        run: docker-compose -f docker-compose.test.yml up -d
+
+      - name: 🏗 Setup monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      - name: 🏗 Store playwright version
+        run: echo "PLAYWRIGHT_VERSION=$(grep -oP '/@playwright/test/\K[0-9.]+(?=:)' ./pnpm-lock.yaml)" >> $GITHUB_ENV
+
+      - name: ♻️ Restore playwright binaries cache
+        uses: actions/cache@v3
+        id: playwright-cache
         with:
-          node-version: 18
-      - name: Install dependencies
-        run: pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
-      - name: Run Playwright tests
-        run: pnpm test:e2e
-      - uses: actions/upload-artifact@v3
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: 📦 Install playwright browsers
+        run: pnpx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: 🧪 Run e2e tests
+        run: NODE_ENV=test pnpm db:migrate && pnpm run test:e2e --trace on
+
+      - name: Generate playwright report
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: packages/web-tests/playwright-report/
           retention-days: 30
