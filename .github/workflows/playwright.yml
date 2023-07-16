@@ -45,7 +45,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - name: 🧪 Run e2e tests
-        run: pnpm run db:push:test && pnpm run test:e2e --trace on
+        run: pnpm run db:push:test && pnpm run build:web && pnpm run test:e2e --trace on
 
       - name: Generate playwright report
         uses: actions/upload-artifact@v3
