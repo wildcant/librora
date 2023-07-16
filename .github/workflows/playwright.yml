@@ -10,6 +10,10 @@ env:
   JWT_EXPIRATION: 24h
   JWT_SECRET: secret
   NEXTAUTH_SECRET: secret
+  CLOUDINARY_CLOUD_NAME: ''
+  CLOUDINARY_API_KEY: ''
+  CLOUDINARY_API_SECRET: ''
+  CLOUDINARY_UPLOAD_PRESET: ''
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
@@ -44,8 +48,12 @@ jobs:
         run: pnpx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
+      - name: 📦 Build & Sync DB
+        shell: bash
+        run: pnpm run db:push:test && pnpm run generate && pnpm run build:web
+
       - name: 🧪 Run e2e tests
-        run: pnpm run db:push:test && pnpm run build:web && pnpm run test:e2e --trace on
+        run: pnpm run test:e2e --trace on
 
       - name: Generate playwright report
         uses: actions/upload-artifact@v3
